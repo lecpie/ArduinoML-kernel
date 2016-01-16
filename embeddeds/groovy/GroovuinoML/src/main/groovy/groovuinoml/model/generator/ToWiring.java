@@ -1,6 +1,5 @@
 package main.groovy.groovuinoml.model.generator;
 
-import groovyjarjarantlr.actions.python.CodeLexer;
 import main.groovy.groovuinoml.model.App;
 import main.groovy.groovuinoml.model.structural.CodeModel;
 import main.groovy.groovuinoml.model.structural.Library;
@@ -13,7 +12,6 @@ import java.util.Iterator;
  */
 
 public class ToWiring extends Visitor<StringBuffer> {
-    private static final String CURRENT_STATE = "current_state";
 
     public ToWiring() {
         this.result = new StringBuffer();
@@ -24,8 +22,8 @@ public class ToWiring extends Visitor<StringBuffer> {
     }
 
     public void visit(App app) {
-        this.w("// Wiring code generated from an ArduinoML model");
-        this.w(String.format("// Application name: %s\n", new Object[]{app.getName()}));
+        this.w("// Groovuinoooooooooo");
+        this.w(String.format("// LibraryAdding: %s\n", new Object[]{app.getName()}));
         this.w("void setup(){");
         Iterator var2 = app.getModels().iterator();
 
@@ -50,6 +48,7 @@ public class ToWiring extends Visitor<StringBuffer> {
         while(var2.hasNext()) {
             this.w(String.format(var2.next().toString()));
         }
+        this.w("}\n");
     }
 
     public void visit(Library lib) {
@@ -63,6 +62,5 @@ public class ToWiring extends Visitor<StringBuffer> {
        // this.w("  boolean guard = millis() - time > debounce;");
       //  this.context.put("current_state", state);
        // state.getTransition().accept(this);
-       // this.w("}\n");
     }
 }
