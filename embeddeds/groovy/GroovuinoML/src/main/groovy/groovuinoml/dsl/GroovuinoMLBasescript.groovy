@@ -1,17 +1,17 @@
 package main.groovy.groovuinoml.dsl
 
-import java.util.List;
+
 
 import io.github.mosser.arduinoml.kernel.behavioral.Action
 import io.github.mosser.arduinoml.kernel.behavioral.State;
-import io.github.mosser.arduinoml.kernel.structural.Sensor
+
 
 abstract class GroovuinoMLBasescript extends Script {
 	// sensor "name" pin n
 	def sensor(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
 	}
-	
+
 	// actuator "name" pin n
 	def actuator(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
