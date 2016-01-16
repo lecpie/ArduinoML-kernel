@@ -3,6 +3,8 @@ package io.github.mosser.arduinoml.kernel;
 import io.github.mosser.arduinoml.kernel.behavioral.State;
 import io.github.mosser.arduinoml.kernel.language.Visitable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.lib.Library;
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ public class App implements NamedElement, Visitable {
 	private List<Brick> bricks = new ArrayList<Brick>();
 	private List<State> states = new ArrayList<State>();
 	private State initial;
+
+	private List <Library> loadedLibraries = new ArrayList<>();
+	private List <LibraryUse> usedLibraries = new ArrayList<>();
 
 	@Override
 	public String getName() {

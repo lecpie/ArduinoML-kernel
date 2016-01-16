@@ -5,9 +5,14 @@ import static io.github.mosser.arduinoml.kernel.behavioral.Operator.*;
 import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.CompilationError;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
+import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,6 +36,19 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	// Let's try to hide this here
 	private static final String ARDUINOML_GEN_ARG1 = "ARDUINOML_GEN_ARG1";
+
+    private void def (String name) {
+        add("#define " + name);
+    }
+
+    private void def (String name, String val) {
+        def(name);
+        w(" " + val);
+    }
+
+    private void undef (String name) {
+        w("#undef " + name);
+    }
 
 	@Override
 	public void visit(App app) {
@@ -115,7 +133,77 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w(String.format("  " + (actuator.isAnalogMode() ? "analog" : "digital") + "Write(%d, " + ARDUINOML_GEN_ARG1 + " );", actuator.getPin()));
 	}
 
-	@Override
+    @SafeVarargs
+    private final void loadArgs(Map <String, String> ... args) {
+
+        for (Map <String, String> priorityArgs: args) {
+            for (String arg : priorityArgs.keySet()) {
+                def(arg, priorityArgs.get(arg));
+            }
+        }
+    }
+    @SafeVarargs
+    private final void unloadArgs( Map <String, String> ... args) {
+        for (Map <String, String> priorityArgs: args) {
+            for (String arg : priorityArgs.keySet()) {
+                undef(arg);
+            }
+        }
+    }
+
+    @SafeVarargs
+    private final void instructions(List<String> instructions , Map <String, String>  ... args) {
+
+        loadArgs(args);
+
+        for (String instruction : instructions) {
+            w(instruction);
+        }
+
+        // Same undef order shouldn't matter
+        for (Map <String, String> priorityArgs : args) {
+            unloadArgs(priorityArgs);
+        }
+    }
+
+    @Override
+    public void global(LibraryUse libraryUse) {
+        instructions(libraryUse.getLibrary().getGlobalInstructions(), libraryUse.getArgsValues());
+    }
+
+    @Override
+    public void setup(LibraryUse libraryUse) {
+        instructions(libraryUse.getLibrary().getSetupInstructions(), libraryUse.getArgsValues());
+    }
+
+    @Override
+    public void setup(MeasureUse measureUse) {
+        instructions(measureUse.getMeasure().getSetupInstructions(), measureUse.getLibraryUse().getArgsValues(),
+                                                                     measureUse                .getArgsValues());
+    }
+
+    @Override
+    public void global(MeasureUse measureUse) {
+        instructions(measureUse.getMeasure().getGlobalInstructions(), measureUse.getLibraryUse().getArgsValues(),
+                                                                      measureUse                .getArgsValues());
+    }
+
+    @Override
+    public void update(MeasureUse measureUse) {
+        instructions(measureUse.getMeasure().getUpdateInstructions(), measureUse.getLibraryUse().getArgsValues(),
+                                                                      measureUse                .getArgsValues());
+    }
+
+    @Override
+    public void expression(MeasureUse measureUse) {
+        loadArgs(measureUse.getLibraryUse().getArgsValues());
+
+        w(measureUse.getMeasure().getReadExpressionString());
+
+        unloadArgs(measureUse.getLibraryUse().getArgsValues());
+    }
+
+    @Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Action action: state.getActions()) {

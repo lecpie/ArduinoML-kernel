@@ -1,6 +1,9 @@
 package io.github.mosser.arduinoml.kernel.generator;
 
 import io.github.mosser.arduinoml.kernel.behavioral.*;
+import io.github.mosser.arduinoml.kernel.lib.Library;
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
+import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.*;
 import io.github.mosser.arduinoml.kernel.App;
 
@@ -29,6 +32,14 @@ public abstract class Visitor<T> {
 
 	public abstract void action (Action action);
 	public abstract void action (PinnedActuator actuator);
+
+	public abstract void setup(LibraryUse libraryUse);
+	public abstract void global(LibraryUse libraryUse);
+
+	public abstract void setup      (MeasureUse measureUse);
+	public abstract void global     (MeasureUse measureUse);
+	public abstract void update     (MeasureUse measureUse);
+	public abstract void expression (MeasureUse measureUse);
 
 
 	/***********************
