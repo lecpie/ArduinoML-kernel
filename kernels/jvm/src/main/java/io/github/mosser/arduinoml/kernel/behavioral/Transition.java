@@ -1,14 +1,17 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
-import io.github.mosser.arduinoml.kernel.generator.Visitable;
+import io.github.mosser.arduinoml.kernel.visitable.Visitable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 import io.github.mosser.arduinoml.kernel.structural.*;
 
 public class Transition implements Visitable {
 
 	private State next;
-	private Sensor sensor;
-	private SIGNAL value;
+
+	Condition condition;
+
+	// private Sensor sensor;
+	// private SIGNAL value;
 
 
 	public State getNext() {
@@ -19,11 +22,13 @@ public class Transition implements Visitable {
 		this.next = next;
 	}
 
+	/*
+
 	public Sensor getSensor() {
 		return sensor;
 	}
 
-	public void setSensor(Sensor sensor) {
+	//public void setSensor(Sensor sensor) {
 		this.sensor = sensor;
 	}
 
@@ -33,6 +38,16 @@ public class Transition implements Visitable {
 
 	public void setValue(SIGNAL value) {
 		this.value = value;
+	}
+
+	*/
+
+	public Condition getCondition() {
+		return condition;
+	}
+
+	public void setCondition(Condition condition) {
+		this.condition = condition;
 	}
 
 	@Override

@@ -42,15 +42,28 @@ public class Switch {
 		off.setActions(Arrays.asList(switchTheLightOff));
 
 		// Creating transitions
+		Condition sensorlow = new Condition();
+		sensorlow.setLeft(button);
+		sensorlow.setOperator(Operator.EQ);
+		sensorlow.setRight(new DigitalExpression(true));
+
 		Transition on2off = new Transition();
 		on2off.setNext(off);
-		on2off.setSensor(button);
-		on2off.setValue(SIGNAL.HIGH);
+		on2off.setCondition(sensorlow);
+		//on2off.setSensor(button);
+		//on2off.setValue(SIGNAL.HIGH);
+
+		Condition sensorhigh = new Condition();
+		sensorhigh.setLeft(button);
+		sensorhigh.setOperator(Operator.EQ);
+		sensorhigh.setRight(new DigitalExpression(false));
 
 		Transition off2on = new Transition();
 		off2on.setNext(on);
-		off2on.setSensor(button);
-		off2on.setValue(SIGNAL.HIGH);
+		off2on.setCondition(sensorhigh);
+
+		//off2on.setSensor(button);
+		//off2on.setValue(SIGNAL.HIGH);
 
 		// Binding transitions to states
 		on.setTransition(on2off);

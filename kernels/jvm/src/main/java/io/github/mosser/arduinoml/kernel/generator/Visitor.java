@@ -18,6 +18,16 @@ public abstract class Visitor<T> {
 	public abstract void visit(Actuator actuator);
 	public abstract void visit(Sensor sensor);
 
+	public abstract void visit(Operator operator);
+	public abstract void visit(Condition condition);
+
+	public abstract void expression (PrimitiveExpression e);
+	public abstract void expression (DigitalExpression e);
+	public abstract void expression (IntegerExpression e);
+	public abstract void expression (RealExpression e);
+
+	public abstract void expression(Sensor sensor);
+
 
 	/***********************
 	 ** Helper mechanisms **
