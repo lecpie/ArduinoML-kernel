@@ -1,7 +1,6 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.visitable.Expression;
 
 public class IntegerExpression extends PrimitiveExpression <Integer> {
 

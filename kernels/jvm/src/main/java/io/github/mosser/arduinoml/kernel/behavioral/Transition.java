@@ -1,8 +1,7 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
-import io.github.mosser.arduinoml.kernel.visitable.Visitable;
+import io.github.mosser.arduinoml.kernel.language.Visitable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.structural.*;
 
 public class Transition implements Visitable {
 
@@ -10,7 +9,7 @@ public class Transition implements Visitable {
 
 	Condition condition;
 
-	// private Sensor sensor;
+	// private PinnedSensor sensor;
 	// private SIGNAL value;
 
 
@@ -24,11 +23,11 @@ public class Transition implements Visitable {
 
 	/*
 
-	public Sensor getSensor() {
+	public PinnedSensor getSensor() {
 		return sensor;
 	}
 
-	//public void setSensor(Sensor sensor) {
+	//public void setSensor(PinnedSensor sensor) {
 		this.sensor = sensor;
 	}
 

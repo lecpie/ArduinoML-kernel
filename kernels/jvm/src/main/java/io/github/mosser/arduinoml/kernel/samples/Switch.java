@@ -13,11 +13,11 @@ public class Switch {
 	public static void main(String[] args) {
 
 		// Declaring elementary bricks
-		Sensor button = new Sensor();
+		PinnedSensor button = new PinnedSensor();
 		button.setName("button");
 		button.setPin(9);
 
-		Actuator led = new Actuator();
+		PinnedActuator led = new PinnedActuator();
 		led.setName("LED");
 		led.setPin(12);
 
@@ -31,11 +31,13 @@ public class Switch {
 		// Creating actions
 		Action switchTheLightOn = new Action();
 		switchTheLightOn.setActuator(led);
-		switchTheLightOn.setValue(SIGNAL.HIGH);
+		switchTheLightOn.setSignalExpression(new DigitalExpression(true));
+		//switchTheLightOn.setValue(SIGNAL.HIGH);
 
 		Action switchTheLightOff = new Action();
 		switchTheLightOff.setActuator(led);
-		switchTheLightOff.setValue(SIGNAL.LOW);
+		switchTheLightOff.setSignalExpression(new DigitalExpression(false));
+		//switchTheLightOff.setValue(SIGNAL.LOW);
 
 		// Binding actions to states
 		on.setActions(Arrays.asList(switchTheLightOn));

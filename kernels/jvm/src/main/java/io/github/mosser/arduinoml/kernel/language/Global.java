@@ -1,4 +1,4 @@
-package io.github.mosser.arduinoml.kernel.visitable;
+package io.github.mosser.arduinoml.kernel.language;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 

@@ -1,7 +1,7 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
 import io.github.mosser.arduinoml.kernel.NamedElement;
-import io.github.mosser.arduinoml.kernel.visitable.Visitable;
+import io.github.mosser.arduinoml.kernel.language.Visitable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 
 import java.util.ArrayList;

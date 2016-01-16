@@ -1,34 +1,41 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
-import io.github.mosser.arduinoml.kernel.visitable.Visitable;
+import io.github.mosser.arduinoml.kernel.language.Expression;
+import io.github.mosser.arduinoml.kernel.language.Typed;
+import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
+import io.github.mosser.arduinoml.kernel.language.Actionable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.structural.Actuator;
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL;
 
-public class Action implements Visitable {
+public class Action implements Actionable, Typed {
 
-	private SIGNAL value;
-	private Actuator actuator;
+	private PinnedActuator actuator;
+	private Expression signalExpression;
 
-
-	public SIGNAL getValue() {
-		return value;
-	}
-
-	public void setValue(SIGNAL value) {
-		this.value = value;
-	}
-
-	public Actuator getActuator() {
+	public PinnedActuator getActuator() {
 		return actuator;
 	}
 
-	public void setActuator(Actuator actuator) {
+	public void setActuator(PinnedActuator actuator) {
 		this.actuator = actuator;
 	}
 
 	@Override
-	public void accept(Visitor visitor) {
-		visitor.visit(this);
+	public void action(Visitor visitor) {
+		visitor.action(this);
+	}
+
+
+	@Override
+	public Type getType() {
+		return signalExpression.getType();
+	}
+
+	public Expression getSignalExpression() {
+		return signalExpression;
+	}
+
+	public void setSignalExpression(Expression signalExpression) {
+		this.signalExpression = signalExpression;
 	}
 }

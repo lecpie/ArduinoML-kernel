@@ -29,6 +29,9 @@ public class ToWiring extends Visitor<StringBuffer> {
 		result.append(String.format("%s\n",s));
 	}
 
+	// Let's try to hide this here
+	private static final String ARDUINOML_GEN_ARG1 = "ARDUINOML_GEN_ARG1";
+
 	@Override
 	public void visit(App app) {
 		w("// Wiring code generated from an ArduinoML model");
@@ -36,7 +39,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 		w("void setup(){");
 		for(Brick brick: app.getBricks()){
-			brick.accept(this);
+			brick.setup(this);
 		}
 		w("}\n");
 
@@ -52,14 +55,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 	}
 
 	@Override
-	public void visit(Actuator actuator) {
-	 	w(String.format("  pinMode(%d, OUTPUT); // %s [Actuator]", actuator.getPin(), actuator.getName()));
+	public void setup(PinnedActuator actuator) {
+	 	w(String.format("  pinMode(%d, OUTPUT); // %s [PinnedActuator]", actuator.getPin(), actuator.getName()));
 	}
 
 
 	@Override
-	public void visit(Sensor sensor) {
-		w(String.format("  pinMode(%d, INPUT);  // %s [Sensor]", sensor.getPin(), sensor.getName()));
+	public void setup(PinnedSensor sensor) {
+		w(String.format("  pinMode(%d, INPUT);  // %s [PinnedSensor]", sensor.getPin(), sensor.getName()));
 	}
 
 	private static final Operator[] searchOpRepr = { EQ,   NE,  GT,  LT,   GE,   LE };
@@ -103,15 +106,20 @@ public class ToWiring extends Visitor<StringBuffer> {
 	}
 
 	@Override
-	public void expression(Sensor sensor) {
-		result.append(String.format("digitalRead(%d)",sensor.getPin()));
+	public void expression(PinnedSensor sensor) {
+		result.append(String.format((sensor.isAnalogMode() ? "analog" : "digital") + "Read(%d)", sensor.getPin()));
+	}
+
+	@Override
+	public void action(PinnedActuator actuator) {
+		w(String.format("  " + (actuator.isAnalogMode() ? "analog" : "digital") + "Write(%d, " + ARDUINOML_GEN_ARG1 + " );", actuator.getPin()));
 	}
 
 	@Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Action action: state.getActions()) {
-			action.accept(this);
+			action.action(this);
 		}
 		w("  boolean guard = millis() - time > debounce;");
 		context.put(CURRENT_STATE, state);
@@ -135,8 +143,12 @@ public class ToWiring extends Visitor<StringBuffer> {
 	}
 
 	@Override
-	public void visit(Action action) {
-		w(String.format("  digitalWrite(%d,%s);",action.getActuator().getPin(),action.getValue()));
+	public void action(Action action) {
+		add("#define " + ARDUINOML_GEN_ARG1 + " ");
+		action.getSignalExpression().expression(this);
+		w("");
+		action.getActuator().action(this);
+		w("#undef " + ARDUINOML_GEN_ARG1);
 	}
 
 }

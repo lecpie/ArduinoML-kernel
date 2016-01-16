@@ -1,7 +1,7 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.visitable.Expression;
+import io.github.mosser.arduinoml.kernel.language.Expression;
 
 public abstract class PrimitiveExpression <T> implements Expression {
     T value;

@@ -13,10 +13,9 @@ public abstract class Visitor<T> {
 
 	public abstract void visit(State state);
 	public abstract void visit(Transition transition);
-	public abstract void visit(Action action);
 
-	public abstract void visit(Actuator actuator);
-	public abstract void visit(Sensor sensor);
+	public abstract void setup(PinnedActuator actuator);
+	public abstract void setup(PinnedSensor sensor);
 
 	public abstract void visit(Operator operator);
 	public abstract void visit(Condition condition);
@@ -26,7 +25,10 @@ public abstract class Visitor<T> {
 	public abstract void expression (IntegerExpression e);
 	public abstract void expression (RealExpression e);
 
-	public abstract void expression(Sensor sensor);
+	public abstract void expression (PinnedSensor sensor);
+
+	public abstract void action (Action action);
+	public abstract void action (PinnedActuator actuator);
 
 
 	/***********************

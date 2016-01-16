@@ -1,8 +1,8 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.visitable.Expression;
-import io.github.mosser.arduinoml.kernel.visitable.Visitable;
+import io.github.mosser.arduinoml.kernel.language.Expression;
+import io.github.mosser.arduinoml.kernel.language.Visitable;
 
 public class Condition implements Visitable {
 

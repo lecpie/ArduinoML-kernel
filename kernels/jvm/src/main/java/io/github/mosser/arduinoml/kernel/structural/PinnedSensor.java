@@ -2,14 +2,14 @@ package io.github.mosser.arduinoml.kernel.structural;
 
 import io.github.mosser.arduinoml.kernel.behavioral.Type;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
-import io.github.mosser.arduinoml.kernel.visitable.Expression;
+import io.github.mosser.arduinoml.kernel.language.Expression;
 
-public class Sensor extends Brick implements Expression {
+public class PinnedSensor extends PinnedBrick implements Expression {
 	private Type type;
 
 	@Override
-	public void accept(Visitor visitor) {
-		visitor.visit(this);
+	public void setup(Visitor visitor) {
+		visitor.setup(this);
 	}
 
 	@Override
