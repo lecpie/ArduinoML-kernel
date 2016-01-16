@@ -1,6 +1,7 @@
 package main.groovy.groovuinoml.dsl;
 
 
+import java.nio.channels.Pipe;
 import java.util.*;
 
 import groovy.lang.Binding;
@@ -14,10 +15,11 @@ import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.lib.Measure;
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
-import io.github.mosser.arduinoml.kernel.structural.Actuator;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
+import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
+import io.github.mosser.arduinoml.kernel.structural.PinnedSensor;
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL;
-import io.github.mosser.arduinoml.kernel.structural.Sensor;
+
 
 
 public class GroovuinoMLModel {
@@ -37,17 +39,17 @@ public class GroovuinoMLModel {
 		this.binding = binding;
 	}
 	
-	public void createSensor(String name, Integer pinNumber) {
-		Sensor sensor = new Sensor();
+	public void createPinnedSensor(String name, Integer pinNumber) {
+		PinnedSensor sensor = new PinnedSensor();
 		sensor.setName(name);
-		//sensor.setPin(pinNumber);
+		sensor.setPin(pinNumber);
 		this.bricks.add(sensor);
 		this.binding.setVariable(name, sensor);
 //		System.out.println("> sensor " + name + " on pin " + pinNumber);
 	}
 	
 	public void createActuator(String name, Integer pinNumber) {
-		Actuator actuator = new Actuator();
+		PinnedActuator actuator = new PinnedActuator();
 		actuator.setName(name);
 		//actuator.setPin(pinNumber);
 		this.bricks.add(actuator);
@@ -62,7 +64,7 @@ public class GroovuinoMLModel {
 		this.binding.setVariable(name, state);
 	}
 	
-	public void createTransition(State from, State to, Sensor sensor, SIGNAL value) {
+	public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
 		Transition transition = new Transition();
 		transition.setNext(to);
 		//transition.setSensor(sensor);
