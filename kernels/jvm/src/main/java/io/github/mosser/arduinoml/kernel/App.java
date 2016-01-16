@@ -58,4 +58,20 @@ public class App implements NamedElement, Visitable {
 	public void accept(Visitor visitor) {
 		visitor.visit(this);
 	}
+
+	public List<Library> getLoadedLibraries() {
+		return loadedLibraries;
+	}
+
+	public void setLoadedLibraries(List<Library> loadedLibraries) {
+		this.loadedLibraries = loadedLibraries;
+	}
+
+	public List<LibraryUse> getUsedLibraries() {
+		return usedLibraries;
+	}
+
+	public void setUsedLibraries(List<LibraryUse> usedLibraries) {
+		this.usedLibraries = usedLibraries;
+	}
 }
