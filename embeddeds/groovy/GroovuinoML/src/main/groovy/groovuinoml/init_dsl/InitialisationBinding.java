@@ -2,7 +2,7 @@ package main.groovy.groovuinoml.init_dsl;
 
 import groovy.lang.Binding;
 import groovy.lang.Script;
-import main.groovy.groovuinoml.init_dsl.InitialisationModel;
+
 
 import java.util.Map;
 

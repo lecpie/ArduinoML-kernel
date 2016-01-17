@@ -8,6 +8,7 @@ import main.groovy.groovuinoml.dsl.GroovuinoMLBinding;
  */
 abstract public class InitialisationBaseScript extends Script{
     def lib(String name){
+        [args : {}]
     }
 
     /*
