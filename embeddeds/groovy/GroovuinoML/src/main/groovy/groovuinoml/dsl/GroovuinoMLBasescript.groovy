@@ -10,13 +10,14 @@ abstract class GroovuinoMLBasescript extends Script {
     // uselib "libname" like param key val [and param key val]*n
     def uselib(String libname){
         Map<String, String> args = new LinkedHashMap<String, String>()
-        //FIXME : Create an instance of a library based on "libname"
-        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libname, args)
+        //FIXME : Create an instance of a library based on "libname" instead of a mocked library
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
         def closure
-        closure = { key, val ->
-                args.put(key, val)
-                [and: closure]
-            }
+        closure = {
+           key, val ->
+               args.put(key, val)
+               [and: closure]
+        }
         [like: closure]
     }
 
