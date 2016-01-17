@@ -1,20 +1,24 @@
 package io.github.mosser.arduinoml.kernel.lib;
 
-import java.util.List;
-import java.util.Map;
+import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.language.Includable;
+
+import java.util.*;
 
 /**
  * Created by lecpie on 1/15/16.
  */
-public class Library {
+public class Library implements Includable {
     private String name;
-    private List <String> includes;
+    private List <String> includes = new ArrayList<>();
 
-    private List <String> globalInstructions;
-    private List <String> setupInstructions;
-    private List <String> beforeReadInstructions;
+    private List <String> globalInstructions = new ArrayList<>();
+    private List <String> setupInstructions = new ArrayList<>();
+    private List <String> beforeReadInstructions = new ArrayList<>();
 
-    private Map<String, String> defaultArgs;
+    private Map<String, String> defaultArgs = new LinkedHashMap<>();
+
+    private Map <String, Measure> measures = new HashMap<>();
 
     public String getName() {
         return name;
@@ -62,5 +66,18 @@ public class Library {
 
     public void setDefaultArgs(Map<String, String> defaultArgs) {
         this.defaultArgs = defaultArgs;
+    }
+
+    public Map<String, Measure> getMeasures() {
+        return measures;
+    }
+
+    public void setMeasures(Map<String, Measure> measures) {
+        this.measures = measures;
+    }
+
+    @Override
+    public void include(Visitor visitor) {
+        visitor.include(this);
     }
 }

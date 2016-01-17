@@ -8,7 +8,9 @@ import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class App implements NamedElement, Visitable {
 
@@ -17,7 +19,7 @@ public class App implements NamedElement, Visitable {
 	private List<State> states = new ArrayList<State>();
 	private State initial;
 
-	private List <Library> loadedLibraries = new ArrayList<>();
+	private Map <String, Library> loadedLibraries = new HashMap<>();
 	private List <LibraryUse> usedLibraries = new ArrayList<>();
 
 	@Override
@@ -59,11 +61,11 @@ public class App implements NamedElement, Visitable {
 		visitor.visit(this);
 	}
 
-	public List<Library> getLoadedLibraries() {
+	public Map <String, Library> getLoadedLibraries() {
 		return loadedLibraries;
 	}
 
-	public void setLoadedLibraries(List<Library> loadedLibraries) {
+	public void setLoadedLibraries(Map <String, Library> loadedLibraries) {
 		this.loadedLibraries = loadedLibraries;
 	}
 

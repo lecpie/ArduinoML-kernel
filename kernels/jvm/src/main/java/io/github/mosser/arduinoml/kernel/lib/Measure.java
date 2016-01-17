@@ -2,6 +2,7 @@ package io.github.mosser.arduinoml.kernel.lib;
 
 import io.github.mosser.arduinoml.kernel.behavioral.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,18 @@ import java.util.Map;
 public class Measure {
     private String name;
 
+    private Library library;
+
+    private Type type;
+
+    private Map <String, String> defaultArgs;
+
+    private List <String> globalInstructions = new ArrayList<>();
+    private List <String> setupInstructions = new ArrayList<>();
+    private List <String> updateInstructions = new ArrayList<>();
+
+    private String readExpressionString;
+
     public Type getType() {
         return type;
     }
@@ -18,14 +31,6 @@ public class Measure {
     public void setType(Type type) {
         this.type = type;
     }
-
-    private Type type;
-
-    private List <String> globalInstructions;
-    private List <String> setupInstructions;
-    private List <String> updateInstructions;
-
-    private String readExpressionString;
 
     public Map<String, String> getDefaultArgs() {
         return defaultArgs;
@@ -75,6 +80,12 @@ public class Measure {
         this.readExpressionString = readExpressionString;
     }
 
-    private Map <String, String> defaultArgs;
+    public Library getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
 
 }
