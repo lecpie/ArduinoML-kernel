@@ -45,10 +45,11 @@ public class SwitchLib {
         Measure dhttemp = new Measure();
 
         Map <String, String> dhttempdefaultargs = new LinkedHashMap<>();
-        dhttempdefaultargs.put("dht_temp_name", "dht_temp");
+        dhttempdefaultargs.put("dht_temp_name", "MEASURE_NAME(dht_obj_name,dht_temp_name,arduinoml_measure_instance)");
         dhttempdefaultargs.put("dht_temp_format_fahr", "true");
         dhttempdefaultargs.put("dht_temp_format_celc", "false");
         dhttempdefaultargs.put("dht_temp_format", "dht_temp_format_celc");
+        dhttempdefaultargs.put("arduinoml_measure_instance","0");
 
         List <String> dhttempglobal = new ArrayList<>();
         dhttempglobal.add("int dht_temp_name;");
@@ -100,80 +101,130 @@ public class SwitchLib {
         App theSwitch = new App();
         theSwitch.setLoadedLibraries(librariestoload);
 
-        // Declaring elementary bricks
-        PinnedSensor button = new PinnedSensor();
-        button.setName("button");
-        button.setPin(9);
-
-        PinnedActuator led = new PinnedActuator();
-        led.setName("LED");
-        led.setPin(12);
-
-        LibraryUse usedht = new LibraryUse();
+        PinnedActuator mood = new PinnedActuator();
+        mood.setName("mood");
+        mood.setPin(9);
+        mood.setAnalogMode(true);
 
         Library dhtloaded = theSwitch.getLoadedLibraries().get("DHT");
 
+        LibraryUse usedht = new LibraryUse();
         usedht.setLibrary(dhtloaded);
+        theSwitch.getUsedLibraries().add(usedht);
+
+        // Type and pin for one dht sensor using one instance of the DHT library
 
         usedht.getArgsValues().put("dht_pin", "9");
         usedht.getArgsValues().put("dht_type", "DHT11");
 
-        MeasureUse temp = new MeasureUse();
-        temp.setName("temperature");
-        temp.setLibraryUse(usedht);
+        // Used measures for this dht
 
-        temp.setMeasure(dhtloaded.getMeasures().get("temperature"));
+        MeasureUse tempcelc = new MeasureUse();
+        tempcelc.setName("temperature_celcius");
+        tempcelc.setLibraryUse(usedht);
+        tempcelc.setMeasure(dhtloaded.getMeasures().get("temperature"));
 
-        theSwitch.getUsedLibraries().add(usedht);
+        MeasureUse tempfahr = new MeasureUse();
+        tempfahr.setName("temperature_fahr");
+        tempfahr.setLibraryUse(usedht);
+        tempfahr.setMeasure(dhtloaded.getMeasures().get("temperature"));
+        tempfahr.getArgsValues().put("format", "dht_temp_format_fahr");
+
+        MeasureUse hum = new MeasureUse();
+        hum.setName("humidity");
+        hum.setLibraryUse(usedht);
+        hum.setMeasure(dhtloaded.getMeasures().get("humidity"));
 
         // Declaring states
         State on = new State();
         on.setName("on");
 
-        State off = new State();
-        off.setName("off");
+        State humid = new State();
+        humid.setName("humid");
+
+        State sick = new State();
+        sick.setName("sick");
+
+        State recovery = new State();
+        recovery.setName("recovery");
+
+
 
         // Creating actions
-        Action switchTheLightOn = new Action();
-        switchTheLightOn.setActuator(led);
-        switchTheLightOn.setSignalExpression(new DigitalExpression(true));
+        Action normalmood = new Action();
+        normalmood.setActuator(mood);
+        normalmood.setSignalExpression(new IntegerExpression(500));
 
-        Action switchTheLightOff = new Action();
-        switchTheLightOff.setActuator(led);
-        switchTheLightOff.setSignalExpression(new DigitalExpression(false));
+        Action humidmood = new Action();
+        humidmood.setActuator(mood);
+        humidmood.setSignalExpression(new IntegerExpression(400));
+
+        Action sickmood = new Action();
+        sickmood.setActuator(mood);
+        sickmood.setSignalExpression(new IntegerExpression(50));
+
+        Action recoveringmood = new Action();
+        recoveringmood.setActuator(mood);
+        recoveringmood.setSignalExpression(new IntegerExpression(150));
 
         // Binding actions to states
-        on.setActions(Arrays.asList(switchTheLightOn));
-        off.setActions(Arrays.asList(switchTheLightOff));
+
+        on.setActions(Arrays.asList(normalmood));
+        humid.setActions(Arrays.asList(humidmood));
+        sick.setActions(Arrays.asList(sickmood));
+        recovery.setActions(Arrays.asList(recoveringmood));
+
+        // Defining conditions
+
+        Condition highhumidity = new Condition();
+        highhumidity.setLeft(hum);
+        highhumidity.setOperator(Operator.GT);
+        highhumidity.setRight(new IntegerExpression(100)); // No idea what the measured data means yet
+
+        Condition lowtemperature = new Condition();
+        lowtemperature.setLeft(tempcelc); // Europeans complain
+        lowtemperature.setOperator(Operator.LT);
+        lowtemperature.setRight(new IntegerExpression(10));
+
+        Condition normaltemperature = new Condition();
+        normaltemperature.setLeft(tempfahr); // Americains define what is normal
+        normaltemperature.setOperator(Operator.GT);
+        normaltemperature.setRight(new IntegerExpression(53));
+
+        Condition normalhumidity = new Condition();
+        normalhumidity.setLeft(hum);
+        normalhumidity.setOperator(Operator.LT);
+        normalhumidity.setRight(new IntegerExpression(90));
 
         // Creating transitions
-        Condition sensorlow = new Condition();
-        sensorlow.setLeft(temp);
-        sensorlow.setOperator(Operator.GT);
-        sensorlow.setRight(new IntegerExpression(35));
 
-        Transition on2off = new Transition();
-        on2off.setNext(off);
-        on2off.setCondition(sensorlow);
+        Transition on2humid = new Transition();
+        on2humid.setNext(humid);
+        on2humid.setCondition(highhumidity);
 
-        Condition sensorhigh = new Condition();
-        sensorhigh.setLeft(temp);
-        sensorhigh.setOperator(Operator.LT);
-        sensorhigh.setRight(new IntegerExpression(32));
+        Transition humid2sick = new Transition();
+        humid2sick.setNext(sick);
+        humid2sick.setCondition(lowtemperature);
 
-        Transition off2on = new Transition();
-        off2on.setNext(on);
-        off2on.setCondition(sensorhigh);
+        Transition sick2recovering = new Transition();
+        sick2recovering.setNext(recovery);
+        sick2recovering.setCondition(normaltemperature);
+
+        Transition recovering2ok = new Transition();
+        recovering2ok.setNext(on);
+        recovering2ok.setCondition(normalhumidity);
 
         // Binding transitions to states
-        on.setTransition(on2off);
-        off.setTransition(off2on);
+        on.setTransition(on2humid);
+        humid.setTransition(humid2sick);
+        sick.setTransition(sick2recovering);
+        recovery.setTransition(recovering2ok);
 
         // Building the App
         theSwitch.setName("Switch!");
-        theSwitch.setBricks(Arrays.asList(button, led, temp ));
-        theSwitch.setStates(Arrays.asList(on, off));
-        theSwitch.setInitial(off);
+        theSwitch.setBricks(Arrays.asList(mood, tempcelc, tempfahr, hum));
+        theSwitch.setStates(Arrays.asList(on, humid, sick, recovery));
+        theSwitch.setInitial(on);
 
         // Generating Code
         Visitor codeGenerator = new ToWiring();

@@ -60,6 +60,12 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("// Wiring code generated from an ArduinoML model");
 		w(String.format("// Application name: %s\n", app.getName()));
 
+		// Provide api for lib definition
+		w("// API for Library definition");
+		w("#define PASTER(LIB, MEASURE, INDEX) LIB ## _ ## MEASURE ## _ ## INDEX");
+		w("#define EVAL(LIB, MEASURE, INDEX) PASTER(LIB, MEASURE, INDEX)");
+
+		w("#define MEASURE_NAME(LIB,MEASURE,INDEX) EVAL(LIB, MEASURE, INDEX)");
 
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
 			usedlib.loadDefaults();
@@ -73,9 +79,22 @@ public class ToWiring extends Visitor<StringBuffer> {
 			usedlib.global(this);
 		}
 
+		Map <Measure, Integer> measuresinstances = new HashMap<>();
 		for (Brick brick : app.getBricks()) {
 			if (brick instanceof MeasureUse) {
-				((MeasureUse) brick).loadDefaults();
+				MeasureUse measureUse = ((MeasureUse) brick);
+				Measure measure = measureUse.getMeasure();
+				measureUse.loadDefaults();
+
+				if (!measuresinstances.containsKey(measure)) {
+					measuresinstances.put(measure, 0);
+				}
+
+				int val = measuresinstances.get(measure);
+				measuresinstances.put(measure, val + 1);
+
+				// Maintain this variable for measure instances
+				measureUse.getArgsValues().put("arduinoml_measure_instance", Integer.toString(val));
 			}
 		}
 
@@ -84,8 +103,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 				((Global) brick).global(this);
 			}
 		}
-
-
 
 		w("void setup(){");
 		for(Brick brick: app.getBricks()){

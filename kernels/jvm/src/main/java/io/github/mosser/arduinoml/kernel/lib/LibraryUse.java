@@ -5,6 +5,7 @@ import io.github.mosser.arduinoml.kernel.language.Global;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public class LibraryUse implements Global {
     private Library library;
-    private Map <String, String> argsValues = new HashMap<>();
+    private Map <String, String> argsValues = new LinkedHashMap<>();
 
     public void loadDefaults() {
         for (String arg : library.getDefaultArgs().keySet()) {
