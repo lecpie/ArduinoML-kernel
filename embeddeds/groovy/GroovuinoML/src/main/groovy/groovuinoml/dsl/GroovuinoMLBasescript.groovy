@@ -1,16 +1,29 @@
 package main.groovy.groovuinoml.dsl
 
-import java.util.List;
-
 import io.github.mosser.arduinoml.kernel.behavioral.Action
-import io.github.mosser.arduinoml.kernel.behavioral.State;
-import io.github.mosser.arduinoml.kernel.structural.Sensor
+import io.github.mosser.arduinoml.kernel.behavioral.State
+import io.github.mosser.arduinoml.kernel.lib.Library;
+import io.github.mosser.arduinoml.kernel.structural.PinnedSensor
 
 abstract class GroovuinoMLBasescript extends Script {
-	// sensor "name" pin n
-	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
-	}
+
+    // uselib "libname" like param key val [and param key val]*n
+    def uselib(String libname){
+        Map<String, String> args = new LinkedHashMap<String, String>()
+        //FIXME : Create an instance of a library based on "libname"
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libname, args)
+        def closure
+        closure = { key, val ->
+                args.put(key, val)
+                [and: closure]
+            }
+        [like: closure]
+    }
+
+    // sensor "name" pin n
+    def sensor(String name) {
+        [pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
+    }
 	
 	// actuator "name" pin n
 	def actuator(String name) {
