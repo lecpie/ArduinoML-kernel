@@ -5,7 +5,12 @@ import static io.github.mosser.arduinoml.kernel.behavioral.Operator.*;
 import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.CompilationError;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
+import io.github.mosser.arduinoml.kernel.language.Expression;
+import io.github.mosser.arduinoml.kernel.language.Global;
+import io.github.mosser.arduinoml.kernel.language.Updatable;
+import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
+import io.github.mosser.arduinoml.kernel.lib.Measure;
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.*;
 
@@ -54,6 +59,33 @@ public class ToWiring extends Visitor<StringBuffer> {
 	public void visit(App app) {
 		w("// Wiring code generated from an ArduinoML model");
 		w(String.format("// Application name: %s\n", app.getName()));
+
+
+		for (LibraryUse usedlib : app.getUsedLibraries()) {
+			usedlib.loadDefaults();
+			Library lib = usedlib.getLibrary();
+			lib.include(this);
+		}
+
+		for (LibraryUse usedlib : app.getUsedLibraries()) {
+			usedlib.loadDefaults();
+			Library lib = usedlib.getLibrary();
+			usedlib.global(this);
+		}
+
+		for (Brick brick : app.getBricks()) {
+			if (brick instanceof MeasureUse) {
+				((MeasureUse) brick).loadDefaults();
+			}
+		}
+
+		for (Brick brick : app.getBricks()) {
+			if (brick instanceof Global) {
+				((Global) brick).global(this);
+			}
+		}
+
+
 
 		w("void setup(){");
 		for(Brick brick: app.getBricks()){
@@ -133,9 +165,16 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w(String.format("  " + (actuator.isAnalogMode() ? "analog" : "digital") + "Write(%d, " + ARDUINOML_GEN_ARG1 + " );", actuator.getPin()));
 	}
 
-    @SafeVarargs
-    private final void loadArgs(Map <String, String> ... args) {
+	@Override
+	public void include(Library library) {
+		for (String include : library.getIncludes()) {
+			w("#include <" + include + ">");
+		}
+	}
 
+	@SafeVarargs
+    private final void loadArgs(Map <String, String> ... args) {
+		w("");
         for (Map <String, String> priorityArgs: args) {
             for (String arg : priorityArgs.keySet()) {
                 def(arg, priorityArgs.get(arg));
@@ -196,11 +235,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void expression(MeasureUse measureUse) {
-        loadArgs(measureUse.getLibraryUse().getArgsValues());
+        loadArgs(measureUse.getLibraryUse().getArgsValues(),
+				 measureUse                .getArgsValues());
 
         w(measureUse.getMeasure().getReadExpressionString());
 
-        unloadArgs(measureUse.getLibraryUse().getArgsValues());
+        unloadArgs(measureUse.getLibraryUse().getArgsValues(),
+				   measureUse                .getArgsValues());
     }
 
     @Override
@@ -218,6 +259,16 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(Transition transition) {
+		Expression left = transition.getCondition().getLeft();
+		Expression right = transition.getCondition().getRight();
+
+		if (left instanceof Updatable) {
+			((Updatable) left).update(this);
+		}
+
+		if (right instanceof Updatable) {
+			((Updatable) right).update(this);
+		}
 
 		add("if (");
 		transition.getCondition().accept(this);
