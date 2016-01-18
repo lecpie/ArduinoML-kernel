@@ -12,15 +12,12 @@ abstract class GroovuinoMLBasescript extends Script {
         Map<String, String> args = new LinkedHashMap<String, String>()
         //FIXME : Create an instance of a library based on "libname" instead of a mocked library
         ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
-        def closure
-        closure = {
-           key, val ->
-               args.put(key, val)
-               [and: closure]
-        }
-        [like: closure]
-    }
-
+		def closure
+		closure = [like: {String key->
+									println("YOUHOU GEET"+key);
+							}
+		           ]
+	}
     // sensor "name" pin n
     def sensor(String name) {
         [pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
