@@ -13,8 +13,8 @@ abstract class GroovuinoMLBasescript extends Script {
         //FIXME : Create an instance of a library based on "libname" instead of a mocked library
         ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
 		def closure
-		closure = [like: {String key->
-									println("YOUHOU GEET"+key);
+		closure = [with: {String key,val->
+									println("YOUHOU GEET "+key+val);
 							}
 		           ]
 	}
