@@ -17,13 +17,12 @@ class GroovuinoMLDSL {
 		configuration.setScriptBaseClass("main.groovy.groovuinoml.dsl.GroovuinoMLBasescript")
 		shell = new GroovyShell(configuration)
 		
-		binding.setVariable("high", SIGNAL.HIGH)
-		binding.setVariable("low", SIGNAL.LOW)
+	//	binding.setVariable("high", SIGNAL.HIGH)
+	//	binding.setVariable("low", SIGNAL.LOW)
 	}
 	
 	void eval(File scriptFile) {
 		Script script = shell.parse(scriptFile)
-		
 		binding.setScript(script)
 		script.setBinding(binding)
 		script.run()

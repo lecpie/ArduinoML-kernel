@@ -13,10 +13,10 @@ abstract class GroovuinoMLBasescript extends Script {
         //FIXME : Create an instance of a library based on "libname" instead of a mocked library
         ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
 		def closure
-		closure = [with: {String key,val->
-									println("YOUHOU GEET "+key+val);
-							}
-		           ]
+		[with: closure = { String key,String val ->
+			println("key"+key+"val"+val+"\n")
+			[and: closure]
+		}]
 	}
     // sensor "name" pin n
     def sensor(String name) {
@@ -34,7 +34,7 @@ abstract class GroovuinoMLBasescript extends Script {
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
 		// recursive closure to allow multiple and statements
 		def closure
-		closure = { actuator -> 
+		closure = { actuator ->
 			[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)
