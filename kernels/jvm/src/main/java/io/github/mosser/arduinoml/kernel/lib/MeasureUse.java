@@ -8,6 +8,7 @@ import io.github.mosser.arduinoml.kernel.language.Updatable;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -16,13 +17,11 @@ import java.util.Map;
 public class MeasureUse extends Brick implements Global, Updatable, Expression {
 
     private Measure measure;
-
     private LibraryUse libraryUse;
 
-    private Map <String, String> argsValues = new HashMap<>();
+    private Map <String, String> argsValues = new LinkedHashMap<>();
 
     public void loadDefaults() {
-        System.out.println("loading defaults");
         for (String arg : measure.getDefaultArgs().keySet()) {
             // Do not override specified arguments
             if (argsValues.containsKey(arg)) continue;

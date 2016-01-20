@@ -3,6 +3,7 @@ package io.github.mosser.arduinoml.kernel.lib;
 import io.github.mosser.arduinoml.kernel.behavioral.Type;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class Measure {
 
     private Type type;
 
-    private Map <String, String> defaultArgs;
+    private Map <String, String> defaultArgs = new LinkedHashMap<>();
 
     private List <String> globalInstructions = new ArrayList<>();
     private List <String> setupInstructions = new ArrayList<>();
