@@ -9,7 +9,6 @@ import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.lib.Measure;
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
-import io.github.mosser.arduinoml.kernel.structural.PinnedSensor;
 
 import java.util.*;
 
@@ -22,46 +21,47 @@ public class SwitchLib {
         // Declaring libraries
         Library libdht = new Library();
 
-        List <String> dhtincludes = new ArrayList<>();
-        dhtincludes.add("DHT.h");
+        List <String> dhtvar = Arrays.asList("dht");
 
         Map <String, String> dhtdefaultargs = new LinkedHashMap<>();
-        dhtdefaultargs.put("dht_obj_name", "dht");
 
-        List <String> dhtglobal = new ArrayList<>();
-        dhtglobal.add("DHT dht_obj_name(dht_pin, dht_type);");
+        List <String> dhtrequired = Arrays.asList("dht_pin", "dht_type");
 
-        List <String> dhtsetup = new ArrayList<>();
-        dhtsetup.add("dht_obj_name.begin();");
+        List <String> dhtincludes = Arrays.asList("DHT.h");
+        List <String> dhtglobal = Arrays.asList("DHT dht(dht_pin, dht_type);");
+        List <String> dhtsetup = Arrays.asList("dht.begin();");
 
         libdht.setIncludes(dhtincludes);
+        libdht.setVariables(dhtvar);
         libdht.setDefaultArgs(dhtdefaultargs);
         libdht.setGlobalInstructions(dhtglobal);
         libdht.setSetupInstructions(dhtsetup);
+        libdht.setRequiredArgs(dhtrequired);
 
         // Measures for dht
 
         // Temperature
         Measure dhttemp = new Measure();
 
+        List <String> dhttempvar = Arrays.asList("temp");
+
         Map <String, String> dhttempdefaultargs = new LinkedHashMap<>();
-        dhttempdefaultargs.put("dht_temp_name", "MEASURE_NAME(dht_obj_name,dht_temp_name,arduinoml_measure_instance)");
         dhttempdefaultargs.put("dht_temp_format_fahr", "true");
         dhttempdefaultargs.put("dht_temp_format_celc", "false");
         dhttempdefaultargs.put("dht_temp_format", "dht_temp_format_celc");
-        dhttempdefaultargs.put("arduinoml_measure_instance","0");
 
         List <String> dhttempglobal = new ArrayList<>();
-        dhttempglobal.add("int dht_temp_name;");
+        dhttempglobal.add("int temp;");
 
         List <String> dhttempupdate = new ArrayList<>();
-        dhttempupdate.add("dht_temp_name = dht_obj_name.readTemperature(dht_temp_format);");
+        dhttempupdate.add("temp = (int) dht.readTemperature(dht_temp_format);");
 
-        String dhttempread = "dht_temp_name";
+        String dhttempread = "temp";
 
         dhttemp.setName("temperature");
         dhttemp.setLibrary(libdht);
         dhttemp.setType(Type.INTEGER);
+        dhttemp.setVariables(dhttempvar);
         dhttemp.setDefaultArgs(dhttempdefaultargs);
         dhttemp.setGlobalInstructions(dhttempglobal);
         dhttemp.setUpdateInstructions(dhttempupdate);
@@ -72,21 +72,20 @@ public class SwitchLib {
         // Humidity
         Measure dhthum = new Measure();
 
-        Map <String, String> dhthumdefaultargs = new LinkedHashMap<>();
-        dhthumdefaultargs.put("dht_hum_name","dht_hum");
+        List <String> dhthumvar = Arrays.asList("temp");
 
         List <String> dhthumglobal = new ArrayList<>();
-        dhthumglobal.add("int dht_hum_name;");
+        dhthumglobal.add("int temp;");
 
         List <String> dhthumupdate = new ArrayList<>();
-        dhthumupdate.add("dht_hum_name = dht_obj_name.readHumidity();");
+        dhthumupdate.add("temp = (int) dht.readHumidity();");
 
-        String dhthumread = "dht_hum_name";
+        String dhthumread = "temp";
 
         dhthum.setName("humidity");
         dhthum.setLibrary(libdht);
         dhthum.setType(Type.INTEGER);
-        dhthum.setDefaultArgs(dhthumdefaultargs);
+        dhthum.setVariables(dhttempvar);
         dhthum.setGlobalInstructions(dhthumglobal);
         dhthum.setUpdateInstructions(dhthumupdate);
         dhthum.setReadExpressionString(dhthumread);
