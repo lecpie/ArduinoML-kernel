@@ -38,9 +38,8 @@ public class InitialisationBinding extends Binding {
 
     public Object getVariable(String name) {
 
-        if ("DHT".equals(name)) {
-            // could do something else like: ((App) this.getVariable("app")).action();
-            System.out.println("TA mere");
+        if ("with".equals(name)) {
+            //Methode dans le Bascript
             return script;
         }
         return super.getVariable(name);
