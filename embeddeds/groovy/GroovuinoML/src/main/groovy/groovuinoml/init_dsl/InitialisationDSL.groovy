@@ -16,26 +16,24 @@ class InitialisationDSL {
     private CompilerConfiguration configuration
     private InitialisationBinding binding
     private InitialisationBaseScript basescript
+    private InitialisationModel model;
 
     InitialisationDSL() {
         binding = new InitialisationBinding()
-        binding.setInitialisationModel(new InitialisationModel(binding))
+        binding.setInitialisationModel(model = new InitialisationModel(binding))
         configuration = new CompilerConfiguration()
-        configuration.setScriptBaseClass("main.groovy.groovuinoml.dsl.InitailisationBaseScript")
+        configuration.setScriptBaseClass("main.groovy.groovuinoml.init_dsl.InitialisationBaseScript")
         shell = new GroovyShell(configuration)
     }
 
     void eval(File scriptFile) {
-        Script script = null;
-        try {
-            script = shell.parse(scriptFile)
-        } catch (IOException e) {
-            e.printStackTrace()
-        }
-
+        Script script = shell.parse(scriptFile)
         binding.setScript(script)
         script.setBinding(binding)
-
         script.run()
+    }
+
+    InitialisationModel getModel() {
+        return model;
     }
 }

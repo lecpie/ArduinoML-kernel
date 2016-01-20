@@ -23,10 +23,8 @@ class GroovuinoMLDSL {
 	
 	void eval(File scriptFile) {
 		Script script = shell.parse(scriptFile)
-		
 		binding.setScript(script)
 		script.setBinding(binding)
-		
 		script.run()
 	}
 }

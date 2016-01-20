@@ -37,12 +37,12 @@ public class InitialisationBinding extends Binding {
     }
 
     public Object getVariable(String name) {
-        /*
-        if ("seb".equals(name)) {
+
+        if ("DHT".equals(name)) {
             // could do something else like: ((App) this.getVariable("app")).action();
-            System.out.println("Seb, c'est bien");
+            System.out.println("TA mere");
             return script;
-        }*/
+        }
         return super.getVariable(name);
     }
 

@@ -16,15 +16,31 @@ import java.util.Map;
  */
 public class InitialisationModel {
 
-    private List <Library> libraries;
-    private List <Measure> measures;
+    public List<Library> getLoaded_libraries() {
+        return loaded_libraries;
+    }
+
+    public void setLoaded_libraries(List<Library> loaded_libraries) {
+        this.loaded_libraries = loaded_libraries;
+    }
+
+    public List<Measure> getLoaded_measures() {
+        return loaded_measures;
+    }
+
+    public void setLoaded_measures(List<Measure> loaded_measures) {
+        this.loaded_measures = loaded_measures;
+    }
+
+    private List <Library> loaded_libraries;
+    private List <Measure> loaded_measures;
 
     private Binding binding;
 
     public InitialisationModel(Binding binding){
 
-        this.libraries = new ArrayList<Library>();
-        this.measures = new ArrayList<Measure>();
+        this.loaded_libraries = new ArrayList<Library>();
+        this.loaded_measures = new ArrayList<Measure>();
         this.binding = binding;
     }
 
@@ -37,7 +53,8 @@ public class InitialisationModel {
         library.setGlobalInstructions(globalInstructions);
         library.setSetupInstructions(setupInstructions);
         library.setDefaultArgs(defaultArgs);
-        this.libraries.add(library);
+        this.loaded_libraries.add(library);
+        this.binding.setVariable(name,library);
     }
 
     public void createMeasure(String name, Type type, List <String> globalInstructions, List <String> setupInstructions,List <String> updateInstructions,String readExpressionString,Map<String, String> defaultArgs){
@@ -50,8 +67,8 @@ public class InitialisationModel {
         measure.setReadExpressionString(readExpressionString);
         measure.setSetupInstructions(setupInstructions);
         measure.setType(type);
-
-        this.measures.add(measure);
+        this.loaded_measures.add(measure);
+        this.binding.setVariable(name,measure);
     }
 
 

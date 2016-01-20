@@ -1,5 +1,6 @@
 package main.groovy.groovuinoml.dsl;
 
+import java.io.File;
 import java.util.*;
 
 import groovy.lang.Binding;
@@ -17,14 +18,41 @@ import io.github.mosser.arduinoml.kernel.structural.Brick;
 import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
 import io.github.mosser.arduinoml.kernel.structural.PinnedSensor;
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL;
-
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
 	private State initialState;
-	private List <LibraryUse> usedLibraries;
+
+    public Map<String, Library> getLoaded_librairies() {
+        return loaded_librairies;
+    }
+
+    public void setLoaded_librairies(Map<String, Library> loaded_librairies) {
+        this.loaded_librairies = loaded_librairies;
+    }
+
+    private Map <String,Library> loaded_librairies = new HashMap<>();
+
+    public List<LibraryUse> getUsedLibraries() {
+        return usedLibraries;
+    }
+
+    public void setUsedLibraries(List<LibraryUse> usedLibraries) {
+        this.usedLibraries = usedLibraries;
+    }
+
+    public List<MeasureUse> getUsedMeasure() {
+        return usedMeasure;
+    }
+
+    public void setUsedMeasure(List<MeasureUse> usedMeasure) {
+        this.usedMeasure = usedMeasure;
+    }
+
+    private List <LibraryUse> usedLibraries;
     private List <MeasureUse> usedMeasure;
 	
 	private Binding binding;
@@ -36,7 +64,9 @@ public class GroovuinoMLModel {
         this.usedMeasure = new ArrayList<MeasureUse>();
 		this.binding = binding;
 	}
-	
+
+
+
 	public void createPinnedSensor(String name, Integer pinNumber) {
 		PinnedSensor sensor = new PinnedSensor();
 		sensor.setName(name);
@@ -98,4 +128,14 @@ public class GroovuinoMLModel {
 		
 		return codeGenerator.getResult();
 	}
+
+    public void importlib(String path) {
+        InitialisationDSL initdsl = new InitialisationDSL();
+
+        initdsl.eval(new File(path));
+
+        for (Library lib : initdsl.getModel().getLoaded_libraries()) {
+            loaded_librairies.put(lib.getName(), lib);
+        }
+    }
 }

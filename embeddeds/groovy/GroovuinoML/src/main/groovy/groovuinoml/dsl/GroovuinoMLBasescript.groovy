@@ -3,10 +3,27 @@ package main.groovy.groovuinoml.dsl
 
 
 import io.github.mosser.arduinoml.kernel.behavioral.Action
-import io.github.mosser.arduinoml.kernel.behavioral.State;
+import io.github.mosser.arduinoml.kernel.behavioral.State
+import io.github.mosser.arduinoml.kernel.lib.Library
+import main.groovy.groovuinoml.init_dsl.InitialisationBinding
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 abstract class GroovuinoMLBasescript extends Script {
+
+	def importlib(String path) {
+			((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().importlib(path)
+
+	}
+	def uselib(String name){
+
+	}
+	def dump(String fuck){
+		println(((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getLoaded_librairies().size());
+
+	}
+
+	/*
 	// sensor "name" pin n
 	def sensor(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
@@ -55,4 +72,6 @@ abstract class GroovuinoMLBasescript extends Script {
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
+
+	*/
 }
