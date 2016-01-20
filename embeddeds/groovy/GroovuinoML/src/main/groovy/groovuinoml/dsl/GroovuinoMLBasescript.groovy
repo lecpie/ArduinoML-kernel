@@ -13,11 +13,33 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	def importlib(String path) {
 			((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().importlib(path)
-
 	}
-	def uselib(String name){
 
+	def uselib(String libName){
+        Map<String, String> args = new LinkedHashMap<String,String>()
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
+        def closure
+        [with: closure = {
+            String key, String val ->
+                args.put(key, val)
+                println("uselib : libname "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
+                [and: closure]
+        }]
 	}
+
+    def usemeasure(String libUseName, String measureName){
+        Map<String, String> args = new LinkedHashMap<String,String>()
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMeasureUse(libUseName, measureName, args)
+
+        def closure
+        [with: closure = {
+            String key, String val ->
+                args.put(key, val)
+                println("usemeasure : libUseName "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
+                [and: closure]
+        }]
+    }
+
 	def dump(String fuck){
 		println(((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getLoaded_librairies().size());
 

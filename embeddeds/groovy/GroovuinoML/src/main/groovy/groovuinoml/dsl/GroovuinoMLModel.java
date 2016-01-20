@@ -22,9 +22,13 @@ import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 public class GroovuinoMLModel {
-	private List<Brick> bricks;
-	private List<State> states;
-	private State initialState;
+    private List<Brick> bricks;
+    private List<State> states;
+    private State initialState;
+    private Map<String, Library> loaded_librairies = new HashMap<>();
+    private List<LibraryUse> usedLibraries;
+    private List<MeasureUse> usedMeasure;
+    private Binding binding;
 
     public Map<String, Library> getLoaded_librairies() {
         return loaded_librairies;
@@ -34,7 +38,6 @@ public class GroovuinoMLModel {
         this.loaded_librairies = loaded_librairies;
     }
 
-    private Map <String,Library> loaded_librairies = new HashMap<>();
 
     public List<LibraryUse> getUsedLibraries() {
         return usedLibraries;
@@ -52,82 +55,90 @@ public class GroovuinoMLModel {
         this.usedMeasure = usedMeasure;
     }
 
-    private List <LibraryUse> usedLibraries;
-    private List <MeasureUse> usedMeasure;
-	
-	private Binding binding;
-	
-	public GroovuinoMLModel(Binding binding) {
-		this.bricks = new ArrayList<Brick>();
-		this.states = new ArrayList<State>();
-		this.usedLibraries = new ArrayList<LibraryUse>();
+
+    public GroovuinoMLModel(Binding binding) {
+        this.bricks = new ArrayList<Brick>();
+        this.states = new ArrayList<State>();
+        this.usedLibraries = new ArrayList<LibraryUse>();
         this.usedMeasure = new ArrayList<MeasureUse>();
-		this.binding = binding;
-	}
-
-
-
-	public void createPinnedSensor(String name, Integer pinNumber) {
-		PinnedSensor sensor = new PinnedSensor();
-		sensor.setName(name);
-		sensor.setPin(pinNumber);
-		this.bricks.add(sensor);
-		this.binding.setVariable(name, sensor);
-//		System.out.println("> sensor " + name + " on pin " + pinNumber);
-	}
-	
-	public void createActuator(String name, Integer pinNumber) {
-		PinnedActuator actuator = new PinnedActuator();
-		actuator.setName(name);
-		//actuator.setPin(pinNumber);
-		this.bricks.add(actuator);
-		this.binding.setVariable(name, actuator);
-	}
-	
-	public void createState(String name, List<Action> actions) {
-		State state = new State();
-		state.setName(name);
-		state.setActions(actions);
-		this.states.add(state);
-		this.binding.setVariable(name, state);
-	}
-	
-	public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
-		Transition transition = new Transition();
-		transition.setNext(to);
-		//transition.setSensor(sensor);
-		//transition.setValue(value);
-		from.setTransition(transition);
-	}
-
-	public void createLibraryUse(Library library,Map <String, String> argsValues){
-		LibraryUse libraryUse = new LibraryUse();
-		libraryUse.setLibrary(library);
-		libraryUse.setArgsValues(argsValues);
-        this.usedLibraries.add(libraryUse);
-	}
-
-    public void createMeasureUse(LibraryUse libraryUse, Measure measure,Map <String, String> argsValues){
-        MeasureUse measureUse = new MeasureUse();
-        measureUse.setLibraryUse(libraryUse);
-        measureUse.setMeasure(measure);
-        measureUse.setArgsValues(argsValues);
-        this.usedMeasure.add(measureUse);
+        this.binding = binding;
     }
 
-	
-	@SuppressWarnings("rawtypes")
-	public Object generateCode(String appName) {
-		App app = new App();
-		app.setName(appName);
-		app.setBricks(this.bricks);
-		app.setStates(this.states);
-		app.setInitial(this.initialState);
-		Visitor codeGenerator = new ToWiring();
-		app.accept(codeGenerator);
-		
-		return codeGenerator.getResult();
-	}
+
+    public void createPinnedSensor(String name, Integer pinNumber) {
+        PinnedSensor sensor = new PinnedSensor();
+        sensor.setName(name);
+        sensor.setPin(pinNumber);
+        this.bricks.add(sensor);
+        this.binding.setVariable(name, sensor);
+//		System.out.println("> sensor " + name + " on pin " + pinNumber);
+    }
+
+    public void createActuator(String name, Integer pinNumber) {
+        PinnedActuator actuator = new PinnedActuator();
+        actuator.setName(name);
+        //actuator.setPin(pinNumber);
+        this.bricks.add(actuator);
+        this.binding.setVariable(name, actuator);
+    }
+
+    public void createState(String name, List<Action> actions) {
+        State state = new State();
+        state.setName(name);
+        state.setActions(actions);
+        this.states.add(state);
+        this.binding.setVariable(name, state);
+    }
+
+    public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
+        Transition transition = new Transition();
+        transition.setNext(to);
+        //transition.setSensor(sensor);
+        //transition.setValue(value);
+        from.setTransition(transition);
+    }
+
+    public void createLibraryUse(String libName, Map<String, String> argsValues) {
+        LibraryUse libraryUse = new LibraryUse();
+        libraryUse.setArgsValues(argsValues);
+        if (loaded_librairies.get(libName) != null) {
+            libraryUse.setLibrary(loaded_librairies.get(libName));
+            this.usedLibraries.add(libraryUse);
+        }
+    }
+
+
+    public void createMeasureUse(String libUseName, String measureName, Map<String, String> argsValues) {
+        MeasureUse measureUse = new MeasureUse();
+        for(LibraryUse libUse : usedLibraries){
+            Library currentLib = libUse.getLibrary();
+            if(currentLib.getName().equals(libUseName)){
+                measureUse.setLibraryUse(libUse);
+                Measure currentMeasure = currentLib.getMeasures().get(measureName);
+                if(currentMeasure != null) {
+                    measureUse.setMeasure(currentMeasure);
+                    measureUse.setArgsValues(argsValues);
+                    this.usedMeasure.add(measureUse);
+                }
+            }
+
+        }
+
+    }
+
+
+    @SuppressWarnings("rawtypes")
+    public Object generateCode(String appName) {
+        App app = new App();
+        app.setName(appName);
+        app.setBricks(this.bricks);
+        app.setStates(this.states);
+        app.setInitial(this.initialState);
+        Visitor codeGenerator = new ToWiring();
+        app.accept(codeGenerator);
+
+        return codeGenerator.getResult();
+    }
 
     public void importlib(String path) {
         InitialisationDSL initdsl = new InitialisationDSL();
