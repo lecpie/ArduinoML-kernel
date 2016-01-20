@@ -33,6 +33,8 @@ public abstract class Visitor<T> {
 	public abstract void action (Action action);
 	public abstract void action (PinnedActuator actuator);
 
+	public abstract void include (Library library);
+
 	public abstract void setup(LibraryUse libraryUse);
 	public abstract void global(LibraryUse libraryUse);
 

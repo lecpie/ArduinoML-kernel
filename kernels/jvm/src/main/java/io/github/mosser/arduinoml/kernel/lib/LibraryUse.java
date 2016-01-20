@@ -1,16 +1,28 @@
 package io.github.mosser.arduinoml.kernel.lib;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.language.Global;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Created by lecpie on 1/15/16.
  */
-public class LibraryUse {
+public class LibraryUse implements Global {
     private Library library;
-    private Map <String, String> argsValues;
+    private Map <String, String> argsValues = new LinkedHashMap<>();
+
+    public void loadDefaults() {
+        for (String arg : library.getDefaultArgs().keySet()) {
+            // Do not override specified arguments
+            if (argsValues.containsKey(arg)) continue;
+
+            argsValues.put(arg, library.getDefaultArgs().get(arg));
+        }
+    }
 
     public Map<String, String> getArgsValues() {
         return argsValues;
@@ -26,5 +38,10 @@ public class LibraryUse {
 
     public void setLibrary(Library library) {
         this.library = library;
+    }
+
+    @Override
+    public void global(Visitor visitor) {
+        visitor.global(this);
     }
 }

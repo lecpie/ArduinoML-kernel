@@ -5,7 +5,12 @@ import static io.github.mosser.arduinoml.kernel.behavioral.Operator.*;
 import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.CompilationError;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
+import io.github.mosser.arduinoml.kernel.language.Expression;
+import io.github.mosser.arduinoml.kernel.language.Global;
+import io.github.mosser.arduinoml.kernel.language.Updatable;
+import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
+import io.github.mosser.arduinoml.kernel.lib.Measure;
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.*;
 
@@ -54,6 +59,50 @@ public class ToWiring extends Visitor<StringBuffer> {
 	public void visit(App app) {
 		w("// Wiring code generated from an ArduinoML model");
 		w(String.format("// Application name: %s\n", app.getName()));
+
+		// Provide api for lib definition
+		w("// API for Library definition");
+		w("#define PASTER(LIB, MEASURE, INDEX) LIB ## _ ## MEASURE ## _ ## INDEX");
+		w("#define EVAL(LIB, MEASURE, INDEX) PASTER(LIB, MEASURE, INDEX)");
+
+		w("#define MEASURE_NAME(LIB,MEASURE,INDEX) EVAL(LIB, MEASURE, INDEX)");
+
+		for (LibraryUse usedlib : app.getUsedLibraries()) {
+			usedlib.loadDefaults();
+			Library lib = usedlib.getLibrary();
+			lib.include(this);
+		}
+
+		for (LibraryUse usedlib : app.getUsedLibraries()) {
+			usedlib.loadDefaults();
+			Library lib = usedlib.getLibrary();
+			usedlib.global(this);
+		}
+
+		Map <Measure, Integer> measuresinstances = new HashMap<>();
+		for (Brick brick : app.getBricks()) {
+			if (brick instanceof MeasureUse) {
+				MeasureUse measureUse = ((MeasureUse) brick);
+				Measure measure = measureUse.getMeasure();
+				measureUse.loadDefaults();
+
+				if (!measuresinstances.containsKey(measure)) {
+					measuresinstances.put(measure, 0);
+				}
+
+				int val = measuresinstances.get(measure);
+				measuresinstances.put(measure, val + 1);
+
+				// Maintain this variable for measure instances
+				measureUse.getArgsValues().put("arduinoml_measure_instance", Integer.toString(val));
+			}
+		}
+
+		for (Brick brick : app.getBricks()) {
+			if (brick instanceof Global) {
+				((Global) brick).global(this);
+			}
+		}
 
 		w("void setup(){");
 		for(Brick brick: app.getBricks()){
@@ -133,9 +182,16 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w(String.format("  " + (actuator.isAnalogMode() ? "analog" : "digital") + "Write(%d, " + ARDUINOML_GEN_ARG1 + " );", actuator.getPin()));
 	}
 
-    @SafeVarargs
-    private final void loadArgs(Map <String, String> ... args) {
+	@Override
+	public void include(Library library) {
+		for (String include : library.getIncludes()) {
+			w("#include <" + include + ">");
+		}
+	}
 
+	@SafeVarargs
+    private final void loadArgs(Map <String, String> ... args) {
+		w("");
         for (Map <String, String> priorityArgs: args) {
             for (String arg : priorityArgs.keySet()) {
                 def(arg, priorityArgs.get(arg));
@@ -196,11 +252,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @Override
     public void expression(MeasureUse measureUse) {
-        loadArgs(measureUse.getLibraryUse().getArgsValues());
+        loadArgs(measureUse.getLibraryUse().getArgsValues(),
+				 measureUse                .getArgsValues());
 
         w(measureUse.getMeasure().getReadExpressionString());
 
-        unloadArgs(measureUse.getLibraryUse().getArgsValues());
+        unloadArgs(measureUse.getLibraryUse().getArgsValues(),
+				   measureUse                .getArgsValues());
     }
 
     @Override
@@ -218,6 +276,16 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(Transition transition) {
+		Expression left = transition.getCondition().getLeft();
+		Expression right = transition.getCondition().getRight();
+
+		if (left instanceof Updatable) {
+			((Updatable) left).update(this);
+		}
+
+		if (right instanceof Updatable) {
+			((Updatable) right).update(this);
+		}
 
 		add("if (");
 		transition.getCondition().accept(this);
