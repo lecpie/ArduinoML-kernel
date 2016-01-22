@@ -16,31 +16,14 @@ import java.util.Map;
  */
 public class InitialisationModel {
 
-    public List<Library> getLoaded_libraries() {
-        return loaded_libraries;
-    }
-
-    public void setLoaded_libraries(List<Library> loaded_libraries) {
-        this.loaded_libraries = loaded_libraries;
-    }
-
-    public List<Measure> getLoaded_measures() {
-        return loaded_measures;
-    }
-
-    public void setLoaded_measures(List<Measure> loaded_measures) {
-        this.loaded_measures = loaded_measures;
-    }
-
-    private List <Library> loaded_libraries;
-    private List <Measure> loaded_measures;
-
+    private List <Library> libraries;
+    private List <Measure> measures;
     private Binding binding;
 
     public InitialisationModel(Binding binding){
 
-        this.loaded_libraries = new ArrayList<Library>();
-        this.loaded_measures = new ArrayList<Measure>();
+        this.libraries = new ArrayList<Library>();
+        this.measures = new ArrayList<Measure>();
         this.binding = binding;
     }
 
@@ -53,11 +36,10 @@ public class InitialisationModel {
         library.setGlobalInstructions(globalInstructions);
         library.setSetupInstructions(setupInstructions);
         library.setDefaultArgs(defaultArgs);
-        this.loaded_libraries.add(library);
-        this.binding.setVariable(name,library);
+        this.libraries.add(library);
     }
 
-    public void createMeasure(String name, Type type, List <String> globalInstructions, List <String> setupInstructions,List <String> updateInstructions,String readExpressionString,Map<String, String> defaultArgs){
+    public void createMeasure(String name,Type type, List <String> globalInstructions, List <String> setupInstructions,List <String> updateInstructions,String readExpressionString,Map<String, String> defaultArgs){
 
         Measure measure = new Measure();
         measure.setName(name);
@@ -67,9 +49,23 @@ public class InitialisationModel {
         measure.setReadExpressionString(readExpressionString);
         measure.setSetupInstructions(setupInstructions);
         measure.setType(type);
-        this.loaded_measures.add(measure);
-        this.binding.setVariable(name,measure);
+        this.measures.add(measure);
     }
 
 
+    public List<Library> getLibraries() {
+        return libraries;
+    }
+
+    public void setLibraries(List<Library> libraries) {
+        this.libraries = libraries;
+    }
+
+    public List<Measure> getMeasures() {
+        return measures;
+    }
+
+    public void setMeasures(List<Measure> measures) {
+        this.measures = measures;
+    }
 }
