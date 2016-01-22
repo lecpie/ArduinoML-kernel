@@ -1,8 +1,11 @@
 package main.groovy.groovuinoml.dsl
 
+
+import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
+import io.github.mosser.arduinoml.kernel.lib.Measure
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
 import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
@@ -38,8 +41,16 @@ abstract class GroovuinoMLBasescript extends Script {
         }]
     }
 
-	def dump(String fuck){
-		println(((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getLoaded_librairies().size());
+	def dump(String fuck) {
+		println("Libraries Loaded : ")
+		for (Map.Entry<String,Library> libraries : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_librairies){
+			println("\t\t - " + libraries.key);
+			for(Map.Entry<String,Measure> measure : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_measures){
+				if(measure.getValue().getLibrary().equals(libraries.value)){
+					println("\t\t\t\t\t (associate with) : " + measure.getKey());
+				}
+			}
+		}
 
 	}
 
