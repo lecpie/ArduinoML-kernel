@@ -12,13 +12,22 @@ public class Library implements Includable {
     private String name;
     private List <String> includes = new ArrayList<>();
 
+    private List <String> requiredArgs = new ArrayList<>();
+    private Map <String, String> defaultArgs = new LinkedHashMap<>();
+
+    private List <String> variables = new ArrayList<>();
+
     private List <String> globalInstructions = new ArrayList<>();
     private List <String> setupInstructions = new ArrayList<>();
-    private List <String> beforeReadInstructions = new ArrayList<>();
+    private List <String> updateInstructions = new ArrayList<>();
 
-    private Map<String, String> defaultArgs = new LinkedHashMap<>();
 
     private Map <String, Measure> measures = new HashMap<>();
+
+    @Override
+    public void include(Visitor visitor) {
+        visitor.include(this);
+    }
 
     public String getName() {
         return name;
@@ -53,11 +62,11 @@ public class Library implements Includable {
     }
 
     public List<String> getBeforeReadInstructions() {
-        return beforeReadInstructions;
+        return updateInstructions;
     }
 
     public void setBeforeReadInstructions(List<String> beforeReadInstructions) {
-        this.beforeReadInstructions = beforeReadInstructions;
+        this.updateInstructions = beforeReadInstructions;
     }
 
     public Map<String, String> getDefaultArgs() {
@@ -76,8 +85,20 @@ public class Library implements Includable {
         this.measures = measures;
     }
 
-    @Override
-    public void include(Visitor visitor) {
-        visitor.include(this);
+    public List<String> getVariables() {
+        return variables;
     }
+
+    public void setVariables(List<String> variables) {
+        this.variables = variables;
+    }
+
+    public List<String> getRequiredArgs() {
+        return requiredArgs;
+    }
+
+    public void setRequiredArgs(List<String> requiredArgs) {
+        this.requiredArgs = requiredArgs;
+    }
+
 }
