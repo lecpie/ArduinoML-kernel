@@ -19,9 +19,13 @@ public class Measure {
 
     private Map <String, String> defaultArgs = new LinkedHashMap<>();
 
+    private List <String> requiredArgs = new ArrayList<>();
+
     private List <String> globalInstructions = new ArrayList<>();
     private List <String> setupInstructions = new ArrayList<>();
     private List <String> updateInstructions = new ArrayList<>();
+
+    private List <String> variables = new ArrayList<>();
 
     private String readExpressionString;
 
@@ -87,6 +91,22 @@ public class Measure {
 
     public void setLibrary(Library library) {
         this.library = library;
+    }
+
+    public List<String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(List<String> variables) {
+        this.variables = variables;
+    }
+
+    public List<String> getRequiredArgs() {
+        return requiredArgs;
+    }
+
+    public void setRequiredArgs(List<String> requiredArgs) {
+        this.requiredArgs = requiredArgs;
     }
 
 }
