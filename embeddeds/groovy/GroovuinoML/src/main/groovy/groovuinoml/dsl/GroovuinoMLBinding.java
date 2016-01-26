@@ -35,9 +35,9 @@ public class GroovuinoMLBinding extends Binding {
 	
 	public Object getVariable(String name) {
 		// Easter egg (to show you this trick: seb is now a keyword!)
-		if ("seb".equals(name)) {
+		if ("DHT".equals(name)) {
 			// could do something else like: ((App) this.getVariable("app")).action();
-			System.out.println("Seb, c'est bien");
+			System.out.println("Ta mere");
 			return script;
 		}
 		return super.getVariable(name);

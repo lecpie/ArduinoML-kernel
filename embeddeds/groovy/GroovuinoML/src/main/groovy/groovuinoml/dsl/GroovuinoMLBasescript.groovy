@@ -1,16 +1,28 @@
 package main.groovy.groovuinoml.dsl
 
-import java.util.List;
-
 import io.github.mosser.arduinoml.kernel.behavioral.Action
-import io.github.mosser.arduinoml.kernel.behavioral.State;
 
+import io.github.mosser.arduinoml.kernel.behavioral.State
+import io.github.mosser.arduinoml.kernel.lib.Library;
+import io.github.mosser.arduinoml.kernel.structural.PinnedSensor
 
 abstract class GroovuinoMLBasescript extends Script {
-	// sensor "name" pin n
-	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
+
+    // uselib "libname" like param key val [and param key val]*n
+    def uselib(String libname){
+        Map<String, String> args = new LinkedHashMap<String, String>()
+        //FIXME : Create an instance of a library based on "libname" instead of a mocked library
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
+		def closure
+		[with: closure = { String key,String val ->
+			println("key"+key+"val"+val+"\n")
+			[and: closure]
+		}]
 	}
+    // sensor "name" pin n
+    def sensor(String name) {
+        [pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
+    }
 	
 	// actuator "name" pin n
 	def actuator(String name) {
@@ -23,7 +35,7 @@ abstract class GroovuinoMLBasescript extends Script {
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
 		// recursive closure to allow multiple and statements
 		def closure
-		closure = { actuator -> 
+		closure = { actuator ->
 			[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)

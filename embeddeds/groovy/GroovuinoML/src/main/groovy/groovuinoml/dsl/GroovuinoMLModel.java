@@ -27,6 +27,7 @@ public class GroovuinoMLModel {
 	private List<State> states;
 	private State initialState;
 	private List <LibraryUse> usedLibraries;
+	private List <Library> loadedLibraries;
     private List <MeasureUse> usedMeasure;
 	
 	private Binding binding;
@@ -34,6 +35,7 @@ public class GroovuinoMLModel {
 	public GroovuinoMLModel(Binding binding) {
 		this.bricks = new ArrayList<Brick>();
 		this.states = new ArrayList<State>();
+		this.loadedLibraries = new ArrayList<Library>();
 		this.usedLibraries = new ArrayList<LibraryUse>();
         this.usedMeasure = new ArrayList<MeasureUse>();
 		this.binding = binding;
@@ -77,6 +79,7 @@ public class GroovuinoMLModel {
 		libraryUse.setLibrary(library);
 		libraryUse.setArgsValues(argsValues);
         this.usedLibraries.add(libraryUse);
+		//FIXME : Creer la variable lib crée dans le binding
 	}
 
     public void createMeasureUse(LibraryUse libraryUse, Measure measure,Map <String, String> argsValues){
@@ -85,6 +88,7 @@ public class GroovuinoMLModel {
         measureUse.setMeasure(measure);
         measureUse.setArgsValues(argsValues);
         this.usedMeasure.add(measureUse);
+		//FIXME : Creer la mesure lib crée dans le binding
     }
 
 	
@@ -94,6 +98,7 @@ public class GroovuinoMLModel {
 		app.setName(appName);
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
+		//FIXME : set lib et mesure
 		app.setInitial(this.initialState);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
