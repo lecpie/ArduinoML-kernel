@@ -3,11 +3,14 @@ package main.groovy.groovuinoml.dsl
 
 import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
+import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.Measure
+import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
-import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL
+import sun.misc.Signal;
 
 
 abstract class GroovuinoMLBasescript extends Script {
@@ -54,13 +57,12 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	}
 
-	/*
+
 	// sensor "name" pin n
 	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
+		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
 	}
 
->>>>>>> initdsl
 	// actuator "name" pin n
 	def actuator(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
@@ -76,7 +78,7 @@ abstract class GroovuinoMLBasescript extends Script {
 			[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)
-				action.setValue(signal)
+                action.setSignalExpression(new DigitalExpression((signal == high) ? true : false))
 				actions.add(action)
 				[and: closure]
 			}]
@@ -105,5 +107,5 @@ abstract class GroovuinoMLBasescript extends Script {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
 
-	*/
+
 }

@@ -5,9 +5,7 @@ import java.util.*;
 
 import groovy.lang.Binding;
 import io.github.mosser.arduinoml.kernel.App;
-import io.github.mosser.arduinoml.kernel.behavioral.Action;
-import io.github.mosser.arduinoml.kernel.behavioral.State;
-import io.github.mosser.arduinoml.kernel.behavioral.Transition;
+import io.github.mosser.arduinoml.kernel.behavioral.*;
 import io.github.mosser.arduinoml.kernel.generator.ToWiring;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 import io.github.mosser.arduinoml.kernel.lib.Library;
@@ -24,6 +22,15 @@ import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 public class GroovuinoMLModel {
     private List<Brick> bricks;
     private List<State> states;
+
+    public State getInitialState() {
+        return initialState;
+    }
+
+    public void setInitialState(State initialState) {
+        this.initialState = initialState;
+    }
+
     private State initialState;
     private Map<String, Library> loaded_librairies = new HashMap<>();
     private Map<String, Measure> loaded_measures = new HashMap<>();
@@ -84,7 +91,7 @@ public class GroovuinoMLModel {
     public void createActuator(String name, Integer pinNumber) {
         PinnedActuator actuator = new PinnedActuator();
         actuator.setName(name);
-        //actuator.setPin(pinNumber);
+        actuator.setPin(pinNumber);
         this.bricks.add(actuator);
         this.binding.setVariable(name, actuator);
     }
@@ -100,8 +107,13 @@ public class GroovuinoMLModel {
     public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
         Transition transition = new Transition();
         transition.setNext(to);
-        //transition.setSensor(sensor);
-        //transition.setValue(value);
+
+        Condition condition = new Condition();
+        condition.setLeft(sensor);
+        condition.setOperator(Operator.EQ);
+        condition.setRight(new DigitalExpression((value == SIGNAL.HIGH) ? true : false));
+        transition.setCondition(condition);
+
         from.setTransition(transition);
     }
 
