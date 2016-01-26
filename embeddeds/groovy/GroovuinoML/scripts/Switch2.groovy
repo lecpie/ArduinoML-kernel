@@ -1,10 +1,10 @@
-sensor "button" pin 9
-actuator "led1" pin 12
-actuator "led2" pin 13
-actuator "led3" pin 14
+sensor "button" digitalPin 9
+actuator "led1" analogPin 12
+actuator "led2" digitalPin 13
+actuator "led3" analogPin 14
 
-state "on" means led1 becomes high
-state "off" means led1 becomes low and led2 becomes low and led3 becomes low
+state "on" means led1 becomes 250
+state "off" means led1 becomes 500 and led2 becomes low and led3 becomes 0
 
 initial off
 

@@ -60,12 +60,20 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	// sensor "name" pin n
 	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
+        [analogPin: { n ->
+            ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n, true)
+        },
+        digitalPin: { n ->
+            ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n, false)
+        }]
 	}
 
 	// actuator "name" pin n
 	def actuator(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
+		[
+                digitalPin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n, false)},
+                analogPin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n, true)}
+        ]
 	}
 	
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
@@ -78,7 +86,7 @@ abstract class GroovuinoMLBasescript extends Script {
 			[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)
-                action.setSignalExpression(new DigitalExpression((signal == high) ? true : false))
+                action.setSignalExpression(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createExpression(signal))
 				actions.add(action)
 				[and: closure]
 			}]

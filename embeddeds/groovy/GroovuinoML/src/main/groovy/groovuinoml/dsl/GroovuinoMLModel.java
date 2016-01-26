@@ -8,6 +8,7 @@ import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
 import io.github.mosser.arduinoml.kernel.generator.ToWiring;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.language.Expression;
 import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.lib.Measure;
@@ -79,19 +80,21 @@ public class GroovuinoMLModel {
     }
 
 
-    public void createPinnedSensor(String name, Integer pinNumber) {
+    public void createPinnedSensor(String name, Integer pinNumber, boolean analog) {
         PinnedSensor sensor = new PinnedSensor();
         sensor.setName(name);
         sensor.setPin(pinNumber);
+        sensor.setAnalogMode(analog);
         this.bricks.add(sensor);
         this.binding.setVariable(name, sensor);
 //		System.out.println("> sensor " + name + " on pin " + pinNumber);
     }
 
-    public void createActuator(String name, Integer pinNumber) {
+    public void createActuator(String name, Integer pinNumber, boolean analog) {
         PinnedActuator actuator = new PinnedActuator();
         actuator.setName(name);
         actuator.setPin(pinNumber);
+        actuator.setAnalogMode(analog);
         this.bricks.add(actuator);
         this.binding.setVariable(name, actuator);
     }
@@ -126,6 +129,22 @@ public class GroovuinoMLModel {
         }
     }
 
+    public Expression createExpression(SIGNAL value) {
+        return new DigitalExpression(value == SIGNAL.HIGH);
+    }
+
+    public Expression createExpression(int value) {
+        return new IntegerExpression(value);
+    }
+
+    public Condition createCondition(Expression left, Operator operator, Expression right) {
+        Condition condition = new Condition();
+        condition.setLeft(left);
+        condition.setOperator(operator);
+        condition.setRight(right);
+
+        return condition;
+    }
 
     public void createMeasureUse(String libUseName, String measureName, Map<String, String> argsValues) {
         MeasureUse measureUse = new MeasureUse();
