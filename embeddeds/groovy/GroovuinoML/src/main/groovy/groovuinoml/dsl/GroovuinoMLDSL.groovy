@@ -17,8 +17,7 @@ class GroovuinoMLDSL {
 		configuration.setScriptBaseClass("main.groovy.groovuinoml.dsl.GroovuinoMLBasescript")
 		shell = new GroovyShell(configuration)
 
-		// FIXME: variable current de lib???
-
+		// FIXME: variable current de lib??
 		
 		binding.setVariable("high", SIGNAL.HIGH)
 		binding.setVariable("low", SIGNAL.LOW)

@@ -24,6 +24,8 @@ class InitialisationDSL {
         configuration = new CompilerConfiguration()
         configuration.setScriptBaseClass("main.groovy.groovuinoml.init_dsl.InitialisationBaseScript")
         shell = new GroovyShell(configuration)
+
+
     }
 
     void eval(File scriptFile) {

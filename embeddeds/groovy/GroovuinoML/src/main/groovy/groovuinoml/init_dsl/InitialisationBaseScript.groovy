@@ -111,12 +111,12 @@ abstract public class InitialisationBaseScript extends Script{
                             println("Measure already assigned")
                         }
                         else{
-                            println("Measure not Found")
+                           // println("Measure not Found")
                         }
                     }
                 }
             else{
-                    println("Library not Found")
+                   // println("Library not Found")
                 }
         }
     }
