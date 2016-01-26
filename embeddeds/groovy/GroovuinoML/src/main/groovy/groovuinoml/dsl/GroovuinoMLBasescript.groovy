@@ -1,29 +1,64 @@
 package main.groovy.groovuinoml.dsl
 
+import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
-
 import io.github.mosser.arduinoml.kernel.behavioral.State
-import io.github.mosser.arduinoml.kernel.lib.Library;
-import io.github.mosser.arduinoml.kernel.structural.PinnedSensor
+import io.github.mosser.arduinoml.kernel.lib.Library
+import io.github.mosser.arduinoml.kernel.lib.Measure
+import main.groovy.groovuinoml.init_dsl.InitialisationBinding
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
+
 
 abstract class GroovuinoMLBasescript extends Script {
 
-    // uselib "libname" like param key val [and param key val]*n
-    def uselib(String libname){
-        Map<String, String> args = new LinkedHashMap<String, String>()
-        //FIXME : Create an instance of a library based on "libname" instead of a mocked library
-        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(new Library(), args)
-		def closure
-		[with: closure = { String key,String val ->
-			println("key"+key+"val"+val+"\n")
-			[and: closure]
-		}]
+	def importlib(String path) {
+			((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().importlib(path)
 	}
-    // sensor "name" pin n
-    def sensor(String name) {
-        [pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n) }]
+
+	def uselib(String libName){
+        Map<String, String> args = new LinkedHashMap<String,String>()
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
+        def closure
+        [with: closure = {
+            String key, String val ->
+                args.put(key, val)
+                println("uselib : libname "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
+                [and: closure]
+        }]
+	}
+
+    def usemeasure(String libUseName, String measureName){
+        Map<String, String> args = new LinkedHashMap<String,String>()
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMeasureUse(libUseName, measureName, args)
+
+        def closure
+        [with: closure = {
+            String key, String val ->
+                args.put(key, val)
+                println("usemeasure : libUseName "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
+                [and: closure]
+        }]
     }
-	
+
+	def dump(String fuck) {
+		println("Libraries Loaded : ")
+		for (Map.Entry<String,Library> libraries : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_librairies){
+			println("\t\t - " + libraries.key);
+			for(Map.Entry<String,Measure> measure : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_measures){
+				if(measure.getValue().getLibrary().equals(libraries.value)){
+					println("\t\t\t\t\t (associate with) : " + measure.getKey());
+				}
+			}
+		}
+
+	}
+
+	/*
+	// sensor "name" pin n
+	def sensor(String name) {
+		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
+	}
+
 	// actuator "name" pin n
 	def actuator(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
@@ -67,4 +102,6 @@ abstract class GroovuinoMLBasescript extends Script {
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
+
+	*/
 }

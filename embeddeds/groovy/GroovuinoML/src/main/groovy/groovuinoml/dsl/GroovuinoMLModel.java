@@ -1,7 +1,6 @@
 package main.groovy.groovuinoml.dsl;
 
-
-import java.nio.channels.Pipe;
+import java.io.File;
 import java.util.*;
 
 import groovy.lang.Binding;
@@ -19,90 +18,147 @@ import io.github.mosser.arduinoml.kernel.structural.Brick;
 import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
 import io.github.mosser.arduinoml.kernel.structural.PinnedSensor;
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL;
-
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 public class GroovuinoMLModel {
-	private List<Brick> bricks;
-	private List<State> states;
-	private State initialState;
-	private List <LibraryUse> usedLibraries;
-	private List <Library> loadedLibraries;
-    private List <MeasureUse> usedMeasure;
-	
-	private Binding binding;
-	
-	public GroovuinoMLModel(Binding binding) {
-		this.bricks = new ArrayList<Brick>();
-		this.states = new ArrayList<State>();
-		this.loadedLibraries = new ArrayList<Library>();
-		this.usedLibraries = new ArrayList<LibraryUse>();
-        this.usedMeasure = new ArrayList<MeasureUse>();
-		this.binding = binding;
-	}
-	
-	public void createPinnedSensor(String name, Integer pinNumber) {
-		PinnedSensor sensor = new PinnedSensor();
-		sensor.setName(name);
-		sensor.setPin(pinNumber);
-		this.bricks.add(sensor);
-		this.binding.setVariable(name, sensor);
-//		System.out.println("> sensor " + name + " on pin " + pinNumber);
-	}
-	
-	public void createActuator(String name, Integer pinNumber) {
-		PinnedActuator actuator = new PinnedActuator();
-		actuator.setName(name);
-		//actuator.setPin(pinNumber);
-		this.bricks.add(actuator);
-		this.binding.setVariable(name, actuator);
-	}
-	
-	public void createState(String name, List<Action> actions) {
-		State state = new State();
-		state.setName(name);
-		state.setActions(actions);
-		this.states.add(state);
-		this.binding.setVariable(name, state);
-	}
-	
-	public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
-		Transition transition = new Transition();
-		transition.setNext(to);
-		//transition.setSensor(sensor);
-		//transition.setValue(value);
-		from.setTransition(transition);
-	}
 
-	public void createLibraryUse(Library library,Map <String, String> argsValues){
-		LibraryUse libraryUse = new LibraryUse();
-		libraryUse.setLibrary(library);
-		libraryUse.setArgsValues(argsValues);
-        this.usedLibraries.add(libraryUse);
-		//FIXME : Creer la variable lib crée dans le binding
-	}
+    private List<Brick> bricks;
+    private List<State> states;
+    private State initialState;
+    private Map<String, Library> loaded_librairies = new HashMap<>();
+    private Map<String, Measure> loaded_measures = new HashMap<>();
+    private List<LibraryUse> usedLibraries;
+    private List<MeasureUse> usedMeasure;
+    private Binding binding;
 
-    public void createMeasureUse(LibraryUse libraryUse, Measure measure,Map <String, String> argsValues){
-        MeasureUse measureUse = new MeasureUse();
-        measureUse.setLibraryUse(libraryUse);
-        measureUse.setMeasure(measure);
-        measureUse.setArgsValues(argsValues);
-        this.usedMeasure.add(measureUse);
-		//FIXME : Creer la mesure lib crée dans le binding
+    public Map<String, Measure> getLoaded_measures() {
+        return loaded_measures;
     }
 
-	
-	@SuppressWarnings("rawtypes")
-	public Object generateCode(String appName) {
-		App app = new App();
-		app.setName(appName);
-		app.setBricks(this.bricks);
-		app.setStates(this.states);
-		//FIXME : set lib et mesure
-		app.setInitial(this.initialState);
-		Visitor codeGenerator = new ToWiring();
-		app.accept(codeGenerator);
-		
-		return codeGenerator.getResult();
-	}
+    public void setLoaded_measures(Map<String, Measure> loaded_measures) {
+        this.loaded_measures = loaded_measures;
+    }
+    public Map<String, Library> getLoaded_librairies() {
+        return loaded_librairies;
+    }
+
+    public void setLoaded_librairies(Map<String, Library> loaded_librairies) {
+        this.loaded_librairies = loaded_librairies;
+    }
+
+    public List<LibraryUse> getUsedLibraries() {
+        return usedLibraries;
+    }
+
+    public void setUsedLibraries(List<LibraryUse> usedLibraries) {
+        this.usedLibraries = usedLibraries;
+    }
+
+    public List<MeasureUse> getUsedMeasure() {
+        return usedMeasure;
+    }
+
+    public void setUsedMeasure(List<MeasureUse> usedMeasure) {
+        this.usedMeasure = usedMeasure;
+    }
+
+
+    public GroovuinoMLModel(Binding binding) {
+        this.bricks = new ArrayList<Brick>();
+        this.states = new ArrayList<State>();
+        this.usedLibraries = new ArrayList<LibraryUse>();
+        this.usedMeasure = new ArrayList<MeasureUse>();
+        this.binding = binding;
+    }
+
+
+    public void createPinnedSensor(String name, Integer pinNumber) {
+        PinnedSensor sensor = new PinnedSensor();
+        sensor.setName(name);
+        sensor.setPin(pinNumber);
+        this.bricks.add(sensor);
+        this.binding.setVariable(name, sensor);
+//		System.out.println("> sensor " + name + " on pin " + pinNumber);
+
+    }
+
+    public void createActuator(String name, Integer pinNumber) {
+        PinnedActuator actuator = new PinnedActuator();
+        actuator.setName(name);
+        //actuator.setPin(pinNumber);
+        this.bricks.add(actuator);
+        this.binding.setVariable(name, actuator);
+    }
+
+    public void createState(String name, List<Action> actions) {
+        State state = new State();
+        state.setName(name);
+        state.setActions(actions);
+        this.states.add(state);
+        this.binding.setVariable(name, state);
+    }
+
+    public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
+        Transition transition = new Transition();
+        transition.setNext(to);
+        //transition.setSensor(sensor);
+        //transition.setValue(value);
+        from.setTransition(transition);
+    }
+
+    public void createLibraryUse(String libName, Map<String, String> argsValues) {
+        LibraryUse libraryUse = new LibraryUse();
+        libraryUse.setArgsValues(argsValues);
+        if (loaded_librairies.get(libName) != null) {
+            libraryUse.setLibrary(loaded_librairies.get(libName));
+            this.usedLibraries.add(libraryUse);
+        }
+    }
+
+
+    public void createMeasureUse(String libUseName, String measureName, Map<String, String> argsValues) {
+        MeasureUse measureUse = new MeasureUse();
+        for(LibraryUse libUse : usedLibraries){
+            Library currentLib = libUse.getLibrary();
+            if(currentLib.getName().equals(libUseName)){
+                measureUse.setLibraryUse(libUse);
+                Measure currentMeasure = currentLib.getMeasures().get(measureName);
+                if(currentMeasure != null) {
+                    measureUse.setMeasure(currentMeasure);
+                    measureUse.setArgsValues(argsValues);
+                    this.usedMeasure.add(measureUse);
+                }
+            }
+
+        }
+
+    }
+
+
+    @SuppressWarnings("rawtypes")
+    public Object generateCode(String appName) {
+        App app = new App();
+        app.setName(appName);
+        app.setBricks(this.bricks);
+        app.setStates(this.states);
+        app.setInitial(this.initialState);
+        Visitor codeGenerator = new ToWiring();
+        app.accept(codeGenerator);
+
+        return codeGenerator.getResult();
+    }
+
+    public void importlib(String path) {
+        InitialisationDSL initdsl = new InitialisationDSL();
+
+        initdsl.eval(new File(path));
+
+        for (Library lib : initdsl.getModel().getLibraries()) {
+            loaded_librairies.put(lib.getName(), lib);
+        }
+        for (Measure measures : initdsl.getModel().getMeasures()) {
+            loaded_measures.put(measures.getName(), measures);
+        }
+    }
 }
