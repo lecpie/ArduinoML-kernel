@@ -15,7 +15,6 @@ class InitialisationDSL {
     private GroovyShell shell
     private CompilerConfiguration configuration
     private InitialisationBinding binding
-    private InitialisationBaseScript basescript
     private InitialisationModel model;
 
     InitialisationDSL() {
@@ -24,8 +23,6 @@ class InitialisationDSL {
         configuration = new CompilerConfiguration()
         configuration.setScriptBaseClass("main.groovy.groovuinoml.init_dsl.InitialisationBaseScript")
         shell = new GroovyShell(configuration)
-
-
     }
 
     void eval(File scriptFile) {
