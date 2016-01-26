@@ -14,18 +14,21 @@ import io.github.mosser.arduinoml.kernel.lib.Measure;
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse;
 import io.github.mosser.arduinoml.kernel.structural.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
  */
 public class ToWiring extends Visitor<StringBuffer> {
+	private final static String AML_LIBRARY_INSTANCE = "__ARDUINOML_LIBRARY_INSTANCE__";
+	private final static String AML_MEASURE_INSTANCE = "__ARDUINOML_MEASURE_INSTANCE__";
 
 	private final static String CURRENT_STATE = "current_state";
+
+	private Map <LibraryUse, Map <String, String> > librarysym = new HashMap<>();
+	private Map <MeasureUse, Map <String, String> > measuresym = new HashMap<>();
+	private int nextsym = 0;
 
 	public ToWiring() {
 		this.result = new StringBuffer();
@@ -62,39 +65,50 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 		// Provide api for lib definition
 		w("// API for Library definition");
-		w("#define PASTER(LIB, MEASURE, INDEX) LIB ## _ ## MEASURE ## _ ## INDEX");
-		w("#define EVAL(LIB, MEASURE, INDEX) PASTER(LIB, MEASURE, INDEX)");
+		w("#define AML_PASTE(A,B) A ## _ ## B");
+		w("#define AML_EVAL(A,B) AML_PASTE(LIB, MEASURE, INDEX)");
+		w("#define AML_CAT(A,B) AML_EVAL(A,B)");
 
-		w("#define MEASURE_NAME(LIB,MEASURE,INDEX) EVAL(LIB, MEASURE, INDEX)");
-
+		int ctr = 0;
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
-			usedlib.loadDefaults();
 			Library lib = usedlib.getLibrary();
+
+			usedlib.getArgsValues().put(AML_LIBRARY_INSTANCE, Integer.toString(ctr++));
+			usedlib.loadDefaults();
+
+			librarysym.put(usedlib, new HashMap<>());
+			for (String var : lib.getVariables()) {
+				int isym = nextsym++;
+				String varname = "_aml_library_var_" + isym;
+				librarysym.get(usedlib).put(var, varname);
+				usedlib.getArgsValues().put(var, varname);
+			}
+
 			lib.include(this);
 		}
 
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
-			usedlib.loadDefaults();
-			Library lib = usedlib.getLibrary();
 			usedlib.global(this);
 		}
 
-		Map <Measure, Integer> measuresinstances = new HashMap<>();
+		ctr = 0;
 		for (Brick brick : app.getBricks()) {
 			if (brick instanceof MeasureUse) {
 				MeasureUse measureUse = ((MeasureUse) brick);
 				Measure measure = measureUse.getMeasure();
-				measureUse.loadDefaults();
-
-				if (!measuresinstances.containsKey(measure)) {
-					measuresinstances.put(measure, 0);
-				}
-
-				int val = measuresinstances.get(measure);
-				measuresinstances.put(measure, val + 1);
 
 				// Maintain this variable for measure instances
-				measureUse.getArgsValues().put("arduinoml_measure_instance", Integer.toString(val));
+				measureUse.getArgsValues().put(AML_MEASURE_INSTANCE, Integer.toString(ctr++));
+				measureUse.loadDefaults();
+
+				measuresym.put(measureUse, new HashMap<>());
+				for (String var : measure.getVariables()) {
+					int isym = nextsym++;
+					String varname = "_aml_measure_var_" + isym;
+
+					measuresym.get(measureUse).put(var, varname);
+					measureUse.getArgsValues().put(var, varname);
+				}
 			}
 		}
 
@@ -209,17 +223,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @SafeVarargs
     private final void instructions(List<String> instructions , Map <String, String>  ... args) {
-
         loadArgs(args);
 
         for (String instruction : instructions) {
             w(instruction);
         }
 
-        // Same undef order shouldn't matter
-        for (Map <String, String> priorityArgs : args) {
-            unloadArgs(priorityArgs);
-        }
+		unloadArgs(args);
     }
 
     @Override
