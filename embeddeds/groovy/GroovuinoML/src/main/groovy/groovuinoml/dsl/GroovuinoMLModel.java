@@ -128,6 +128,19 @@ public class GroovuinoMLModel {
         from.setTransition(transition);
     }
 
+    public void createTransition(State from, State to, PinnedSensor sensor, int value, Operator op) {
+        Transition transition = new Transition();
+        transition.setNext(to);
+
+        Condition condition = new Condition();
+        condition.setLeft(sensor);
+        condition.setOperator(op);
+        condition.setRight(new IntegerExpression(value));
+        transition.setCondition(condition);
+
+        from.setTransition(transition);
+    }
+
     public void createLibraryUse(String libName, Map<String, String> argsValues) {
         LibraryUse libraryUse = new LibraryUse();
         libraryUse.setArgsValues(argsValues);

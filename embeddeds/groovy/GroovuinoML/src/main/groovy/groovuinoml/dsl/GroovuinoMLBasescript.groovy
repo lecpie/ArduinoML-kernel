@@ -130,25 +130,32 @@ abstract class GroovuinoMLBasescript extends Script {
     def from(State state1) {
         [to: { state2 ->
             [when: { sensor ->
-                [EQ: { signal ->
+                [EQ: { int signal ->
                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
                 },
-                 GE: { signal ->
+                 GE: { int signal ->
                      // println("cc")
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GE)
                  },
-                 GT: { signal ->
+                 GT: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GT)
                  },
-                 LE: { signal ->
+                 LE: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LE)
                  },
-                 LT: { signal ->
+                 LT: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LT)
                  },
-                 NE: { signal ->
+                 NE: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
-                 }]
+                 },
+                 EQ: { SIGNAL signal ->
+                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
+                 },
+                 NE: { SIGNAL signal ->
+                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
+                 }
+                ]
             }]
         }]
     }

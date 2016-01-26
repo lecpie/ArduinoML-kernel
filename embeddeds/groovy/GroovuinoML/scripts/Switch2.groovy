@@ -9,11 +9,11 @@ state "off" means led1 becomes 500 and led2 becomes low and led3 becomes 0
 initial off
 
 from on to off when button EQ high
-from off to on when button GE high
-from off to on when button GT high
-from off to on when button LT high
-from off to on when button LE high
-from off to on when button NE high
+from off to on when button EQ high
+from off to on when button EQ high
+from off to on when button EQ high
+from off to on when button EQ high
+from off to on when button GT 5
 
 
 
