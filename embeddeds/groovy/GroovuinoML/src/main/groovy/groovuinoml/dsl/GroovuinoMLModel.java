@@ -111,14 +111,27 @@ public class GroovuinoMLModel {
         this.binding.setVariable(name, state);
     }
 
-    public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
+    public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value, Operator op) {
         Transition transition = new Transition();
         transition.setNext(to);
 
         Condition condition = new Condition();
         condition.setLeft(sensor);
-        condition.setOperator(Operator.EQ);
+        condition.setOperator(op);
         condition.setRight(new DigitalExpression((value == SIGNAL.HIGH) ? true : false));
+        transition.setCondition(condition);
+
+        from.setTransition(transition);
+    }
+
+    public void createTransition(State from, State to, PinnedSensor sensor, int value, Operator op) {
+        Transition transition = new Transition();
+        transition.setNext(to);
+
+        Condition condition = new Condition();
+        condition.setLeft(sensor);
+        condition.setOperator(op);
+        condition.setRight(new IntegerExpression(value));
         transition.setCondition(condition);
 
         from.setTransition(transition);
