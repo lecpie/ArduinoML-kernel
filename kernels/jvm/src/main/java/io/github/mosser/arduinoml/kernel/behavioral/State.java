@@ -1,6 +1,7 @@
 package io.github.mosser.arduinoml.kernel.behavioral;
 
 import io.github.mosser.arduinoml.kernel.NamedElement;
+import io.github.mosser.arduinoml.kernel.language.Actionable;
 import io.github.mosser.arduinoml.kernel.language.Visitable;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public class State implements NamedElement, Visitable {
 
 	private String name;
-	private List<Action> actions = new ArrayList<Action>();
+	private List<Actionable> actions = new ArrayList<Actionable>();
 	private Transition transition;
 
 	@Override
@@ -23,11 +24,11 @@ public class State implements NamedElement, Visitable {
 		this.name = name;
 	}
 
-	public List<Action> getActions() {
+	public List<Actionable> getActions() {
 		return actions;
 	}
 
-	public void setActions(List<Action> actions) {
+	public void setActions(List<Actionable> actions) {
 		this.actions = actions;
 	}
 

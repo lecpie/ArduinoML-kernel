@@ -32,6 +32,7 @@ public abstract class Visitor<T> {
 
 	public abstract void action (Action action);
 	public abstract void action (PinnedActuator actuator);
+	public abstract void action (Sleep sleep);
 
 	public abstract void include (Library library);
 

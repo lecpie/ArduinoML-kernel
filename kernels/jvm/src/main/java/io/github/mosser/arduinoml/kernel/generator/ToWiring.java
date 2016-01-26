@@ -5,6 +5,7 @@ import static io.github.mosser.arduinoml.kernel.behavioral.Operator.*;
 import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.CompilationError;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
+import io.github.mosser.arduinoml.kernel.language.Actionable;
 import io.github.mosser.arduinoml.kernel.language.Expression;
 import io.github.mosser.arduinoml.kernel.language.Global;
 import io.github.mosser.arduinoml.kernel.language.Updatable;
@@ -274,7 +275,7 @@ public class ToWiring extends Visitor<StringBuffer> {
     @Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
-		for(Action action: state.getActions()) {
+		for(Actionable action: state.getActions()) {
 			action.action(this);
 		}
 		w("  boolean guard = millis() - time > debounce;");
@@ -315,6 +316,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("");
 		action.getActuator().action(this);
 		w("#undef " + ARDUINOML_GEN_ARG1);
+	}
+
+	@Override
+	public void action(Sleep sleep) {
+		w("delay(" + sleep.getDelay() + ");");
 	}
 
 }

@@ -6,7 +6,9 @@ import io.github.mosser.arduinoml.kernel.behavioral.Action
 import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
+import io.github.mosser.arduinoml.kernel.lib.MeasureUse
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
 import main.groovy.groovuinoml.init_dsl.InitialisationDSL
@@ -20,6 +22,7 @@ abstract class GroovuinoMLBasescript extends Script {
 	}
 
 	def uselib(String libName){
+        /*
         Map<String, String> args = new LinkedHashMap<String,String>()
         ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
         def closure
@@ -28,6 +31,25 @@ abstract class GroovuinoMLBasescript extends Script {
                 args.put(key, val)
                 println("uselib : libname "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
                 [and: closure]
+        }]
+        */
+
+        GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
+
+        LibraryUse libraryUse = new LibraryUse();
+        Library usedLibrary =  model.getLoaded_librairies().get(libName)
+
+
+        def closure
+        [measure: closure = { name ->
+            Measure measure = usedLibrary.getMeasures().get(name)
+            [named: { measureName ->
+                MeasureUse measureUse = new MeasureUse()
+                measureUse.setName(measureName)
+
+                model.getUsedMeasure().add(measureName)
+                model.get
+            }]
         }]
 	}
 
