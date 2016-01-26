@@ -130,29 +130,29 @@ abstract class GroovuinoMLBasescript extends Script {
     def from(State state1) {
         [to: { state2 ->
             [when: { sensor ->
-                [EQ: { int signal ->
+                [eq: { int signal ->
                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
                 },
-                 GE: { int signal ->
+                 greater_eq: { int signal ->
                      // println("cc")
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GE)
                  },
-                 GT: { int signal ->
+                 greater_than: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GT)
                  },
-                 LE: { int signal ->
+                 lower_eq: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LE)
                  },
-                 LT: { int signal ->
+                 lower_than: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LT)
                  },
-                 NE: { int signal ->
+                 not_eq: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
                  },
-                 EQ: { SIGNAL signal ->
+                 eq: { SIGNAL signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
                  },
-                 NE: { SIGNAL signal ->
+                 not_eq: { SIGNAL signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
                  }
                 ]
