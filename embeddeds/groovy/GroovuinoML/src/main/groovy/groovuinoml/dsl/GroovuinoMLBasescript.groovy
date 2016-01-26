@@ -1,19 +1,13 @@
 package main.groovy.groovuinoml.dsl
 
 
-import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
-import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
 import io.github.mosser.arduinoml.kernel.behavioral.Operator
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse
-import io.github.mosser.arduinoml.kernel.structural.SIGNAL
-import main.groovy.groovuinoml.init_dsl.InitialisationBinding
-import main.groovy.groovuinoml.init_dsl.InitialisationDSL
-import sun.misc.Signal;
 
 
 abstract class GroovuinoMLBasescript extends Script {
@@ -22,53 +16,58 @@ abstract class GroovuinoMLBasescript extends Script {
         ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().importlib(path)
     }
 
+    private LibraryUse current = null
 
 	def uselib(String libName){
-        /*
-        Map<String, String> args = new LinkedHashMap<String,String>()
-        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
->>>>>>> 74e29604a90609c10a350175a8e33d8167e83ee8
-        def closure
-        [with: closure = {
-            String key, String val ->
-                args.put(key, val)
-                println("uselib : libname " + key + " " + val + " size : " + ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
-                [and: closure]
-        }]
-<<<<<<< HEAD
-    }
-=======
-        */
-
         GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
 
         LibraryUse libraryUse = new LibraryUse();
         Library usedLibrary =  model.getLoaded_librairies().get(libName)
+        libraryUse.setLibrary(usedLibrary)
+        Map <String, String> args = usedLibrary.getDefaultArgs()
 
-
-        def closure
-        [measure: closure = { name ->
-            Measure measure = usedLibrary.getMeasures().get(name)
-            [named: { measureName ->
-                MeasureUse measureUse = new MeasureUse()
-                measureUse.setName(measureName)
-
-                model.getUsedMeasure().add(measureName)
-                model.get
-            }]
-        }]
-	}
-
-    def usemeasure(String libUseName, String measureName) {
-        Map<String, String> args = new LinkedHashMap<String, String>()
-        ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createMeasureUse(libUseName, measureName, args)
+        model.getUsedLibraries().add(libraryUse)
+        current = libraryUse
 
         def closure
         [with: closure = {
-            String key, String val ->
-                args.put(key, val)
-                println("usemeasure : libUseName " + key + " " + val + " size : " + ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
-                [and: closure]
+            String key ->
+                [valued: {
+                    String val ->
+                        args.put(key, val)
+                        [and: closure]
+                }]
+
+        }]
+	}
+
+    def usemeasure(String measureName) {
+        GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
+
+        Map<String, String> args = new LinkedHashMap<String, String>()
+
+        MeasureUse measureUse = new MeasureUse();
+        measureUse.setName(measureName)
+        measureUse.setLibraryUse(current)
+        measureUse.setMeasure(current.getLibrary().getMeasures().get(measureName))
+
+        model.getUsedMeasure().add(measureUse)
+        model.getBricks()     .add(measureUse)
+
+        [named: { String name ->
+            measureUse.setName(name)
+            binding.setVariable(measureUse.getName(), measureUse)
+            println("Das binding !")
+            println binding.getVariables()
+            def closure
+            [with: closure = {
+                String key ->
+                    [valued: {
+                        String val ->
+                            args.put(key, val)
+                            [and: closure]
+                    }]
+            }]
         }]
     }
 

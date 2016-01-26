@@ -28,12 +28,12 @@ abstract public class InitialisationBaseScript extends Script{
             [and : closureArgs]
             //[setup: closureSetup]
         },
-        includes: closureBefore = {String includes ->
+        includes: closureIncludes = {String includes ->
             current_librairy.getIncludes().add(includes)
-            [and : closureBefore]
+            [and : closureIncludes]
         },
-        global: closureGlobal = {String includes ->
-            current_librairy.getIncludes().add(includes)
+        global: closureGlobal = {String global ->
+            current_librairy.getGlobalInstructions().add(global)
             [and : closureGlobal]
         },
         before: closureBefore = {String before ->
@@ -49,13 +49,7 @@ abstract public class InitialisationBaseScript extends Script{
     def exportlib(String nameLibrary) {
         current_librairy.setName(nameLibrary)
         ((InitialisationBinding)this.getBinding()).getInitialisationModel()
-                .createLibrary(current_librairy.getName(),
-                current_librairy.getIncludes(),
-                current_librairy.getVariables(),
-                current_librairy.getGlobalInstructions(),
-                current_librairy.getSetupInstructions(),
-                current_librairy.getBeforeReadInstructions(),
-                current_librairy.getDefaultArgs())
+                .createLibrary(current_librairy)
         current_librairy = null;
         current_librairy = new Library()
     }
@@ -99,7 +93,11 @@ abstract public class InitialisationBaseScript extends Script{
                 read: closureRead = {String read ->
                     current_measure.setReadExpressionString(read)
                     [and : closureRead]
-                }
+                },
+                variables: closureVariable = {String variable ->
+                    current_measure.getVariables().add(variable)
+                    [and : closureVariable]
+                },
         ]
     }
 
@@ -129,16 +127,7 @@ abstract public class InitialisationBaseScript extends Script{
     def exportmeasure(String nameMeasure) {
 
         current_measure.setName(nameMeasure)
-        ((InitialisationBinding)this.getBinding()).getInitialisationModel().createMeasure(
-                current_measure.getName(),
-                current_measure.getType(),
-                current_measure.getGlobalInstructions(),
-                current_measure.getSetupInstructions(),
-                current_measure.getUpdateInstructions(),
-                current_measure.getReadExpressionString(),
-                current_measure.getDefaultArgs()
-
-        )
+        ((InitialisationBinding)this.getBinding()).getInitialisationModel().createMeasure(current_measure)
         current_measure = null
         current_measure = new Measure()
     }
