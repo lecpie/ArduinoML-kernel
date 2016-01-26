@@ -280,7 +280,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 		w("  boolean guard = millis() - time > debounce;");
 		context.put(CURRENT_STATE, state);
-		state.getTransition().accept(this);
+
+		if (state.getTransition() != null) {
+			state.getTransition().accept(this);
+		}
+
 		w("}\n");
 
 	}
