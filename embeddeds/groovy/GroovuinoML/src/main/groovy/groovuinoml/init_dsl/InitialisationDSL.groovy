@@ -15,7 +15,6 @@ class InitialisationDSL {
     private GroovyShell shell
     private CompilerConfiguration configuration
     private InitialisationBinding binding
-    private InitialisationBaseScript basescript
     private InitialisationModel model;
 
     InitialisationDSL() {

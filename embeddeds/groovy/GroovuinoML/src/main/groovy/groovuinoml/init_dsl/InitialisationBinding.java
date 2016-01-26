@@ -38,10 +38,14 @@ public class InitialisationBinding extends Binding {
 
     public Object getVariable(String name) {
 
-        if ("with".equals(name)) {
-            //Methode dans le Bascript
+       /* if ("withlib".equals(name)) {
+            System.out.println("LIB");
             return script;
         }
+        if ("withmeasure".equals(name)) {
+            System.out.println("MEASURE");
+            return script;
+        }*/
         return super.getVariable(name);
     }
 

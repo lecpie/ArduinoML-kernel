@@ -27,12 +27,13 @@ public class InitialisationModel {
         this.binding = binding;
     }
 
-    public void createLibrary(String name,List <String> includes,List <String> globalInstructions,List <String> setupInstructions,List <String> beforeReadInstructions,Map<String, String> defaultArgs){
+    public void createLibrary(String name,List <String> includes,List <String> variables,List <String> globalInstructions,List <String> setupInstructions,List <String> beforeReadInstructions,Map<String, String> defaultArgs){
 
         Library library = new Library();
         library.setName(name);
         library.setIncludes(includes);
         library.setBeforeReadInstructions(beforeReadInstructions);
+        library.setVariables(variables);
         library.setGlobalInstructions(globalInstructions);
         library.setSetupInstructions(setupInstructions);
         library.setDefaultArgs(defaultArgs);
