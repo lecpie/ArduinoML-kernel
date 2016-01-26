@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.github.mosser.arduinoml.kernel.behavioral.Action
 import io.github.mosser.arduinoml.kernel.behavioral.State;
-import io.github.mosser.arduinoml.kernel.structural.Sensor
+
 
 abstract class GroovuinoMLBasescript extends Script {
 	// sensor "name" pin n

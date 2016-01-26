@@ -8,7 +8,6 @@ class GroovuinoMLDSL {
 	private GroovyShell shell
 	private CompilerConfiguration configuration
 	private GroovuinoMLBinding binding
-	private GroovuinoMLBasescript basescript
 	
 	GroovuinoMLDSL() {
 		binding = new GroovuinoMLBinding()
