@@ -8,6 +8,7 @@ import io.github.mosser.arduinoml.kernel.App;
 import io.github.mosser.arduinoml.kernel.behavioral.*;
 import io.github.mosser.arduinoml.kernel.generator.ToWiring;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.language.Actionable;
 import io.github.mosser.arduinoml.kernel.language.Expression;
 import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
@@ -102,7 +103,7 @@ public class GroovuinoMLModel {
         this.binding.setVariable(name, actuator);
     }
 
-    public void createState(String name, List<Action> actions) {
+    public void createState(String name, List<Actionable> actions) {
         State state = new State();
         state.setName(name);
         state.setActions(actions);
