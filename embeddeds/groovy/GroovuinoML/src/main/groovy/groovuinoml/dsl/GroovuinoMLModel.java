@@ -21,6 +21,14 @@ import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 public class GroovuinoMLModel {
+    public List<Brick> getBricks() {
+        return bricks;
+    }
+
+    public void setBricks(List<Brick> bricks) {
+        this.bricks = bricks;
+    }
+
     private List<Brick> bricks;
     private List<State> states;
 

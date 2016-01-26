@@ -39,8 +39,11 @@ public class Switch {
 		switchTheLightOff.setSignalExpression(new DigitalExpression(false));
 		//switchTheLightOff.setValue(SIGNAL.LOW);
 
+		Sleep sleep = new Sleep();
+		sleep.setDelay(1000);
+
 		// Binding actions to states
-		on.setActions(Arrays.asList(switchTheLightOn));
+		on.setActions(Arrays.asList(switchTheLightOn, sleep));
 		off.setActions(Arrays.asList(switchTheLightOff));
 
 		// Creating transitions

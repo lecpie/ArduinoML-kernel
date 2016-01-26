@@ -39,6 +39,10 @@ abstract public class InitialisationBaseScript extends Script{
         before: closureBefore = {String before ->
             current_librairy.getBeforeReadInstructions().add(before)
             [and : closureBefore]
+        },
+        variables: closureVariable = {String variable->
+            current_librairy.getVariables().add(variable)
+            [and : closureVariable]
         }
         ]
     }
@@ -47,6 +51,7 @@ abstract public class InitialisationBaseScript extends Script{
         ((InitialisationBinding)this.getBinding()).getInitialisationModel()
                 .createLibrary(current_librairy.getName(),
                 current_librairy.getIncludes(),
+                current_librairy.getVariables(),
                 current_librairy.getGlobalInstructions(),
                 current_librairy.getSetupInstructions(),
                 current_librairy.getBeforeReadInstructions(),
@@ -105,18 +110,19 @@ abstract public class InitialisationBaseScript extends Script{
                     for(Measure measure : ((InitialisationBinding)this.getBinding()).getInitialisationModel().measures) {
                         if (measure.getName().equals(measureName) && measure.getLibrary().equals(null)) {
                             measure.setLibrary(librairies)
+                            librairies.getMeasures().put(measure.getName(), measure)
                             println("Found Matching Library/Measure")
                         }
                         else if(measure.getName().equals(measureName) && !measure.getLibrary().equals(null)){
                             println("Measure already assigned")
                         }
                         else{
-                            println("Measure not Found")
+                           // println("Measure not Found")
                         }
                     }
                 }
             else{
-                    println("Library not Found")
+                   // println("Library not Found")
                 }
         }
     }
@@ -136,7 +142,5 @@ abstract public class InitialisationBaseScript extends Script{
         current_measure = null
         current_measure = new Measure()
     }
-
-
 }
 

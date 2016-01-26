@@ -7,7 +7,9 @@ import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
 import io.github.mosser.arduinoml.kernel.behavioral.Operator
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
+import io.github.mosser.arduinoml.kernel.lib.MeasureUse
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
 import main.groovy.groovuinoml.init_dsl.InitialisationDSL
@@ -20,9 +22,12 @@ abstract class GroovuinoMLBasescript extends Script {
         ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().importlib(path)
     }
 
-    def uselib(String libName) {
-        Map<String, String> args = new LinkedHashMap<String, String>()
-        ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
+
+	def uselib(String libName){
+        /*
+        Map<String, String> args = new LinkedHashMap<String,String>()
+        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
+>>>>>>> 74e29604a90609c10a350175a8e33d8167e83ee8
         def closure
         [with: closure = {
             String key, String val ->
@@ -30,7 +35,29 @@ abstract class GroovuinoMLBasescript extends Script {
                 println("uselib : libname " + key + " " + val + " size : " + ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
                 [and: closure]
         }]
+<<<<<<< HEAD
     }
+=======
+        */
+
+        GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
+
+        LibraryUse libraryUse = new LibraryUse();
+        Library usedLibrary =  model.getLoaded_librairies().get(libName)
+
+
+        def closure
+        [measure: closure = { name ->
+            Measure measure = usedLibrary.getMeasures().get(name)
+            [named: { measureName ->
+                MeasureUse measureUse = new MeasureUse()
+                measureUse.setName(measureName)
+
+                model.getUsedMeasure().add(measureName)
+                model.get
+            }]
+        }]
+	}
 
     def usemeasure(String libUseName, String measureName) {
         Map<String, String> args = new LinkedHashMap<String, String>()
