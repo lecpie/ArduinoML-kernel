@@ -129,25 +129,32 @@ abstract class GroovuinoMLBasescript extends Script {
     def from(State state1) {
         [to: { state2 ->
             [when: { sensor ->
-                [EQ: { signal ->
+                [eq: { int signal ->
                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
                 },
-                 GE: { signal ->
+                 greater_eq: { int signal ->
                      // println("cc")
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GE)
                  },
-                 GT: { signal ->
+                 greater_than: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GT)
                  },
-                 LE: { signal ->
+                 lower_eq: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LE)
                  },
-                 LT: { signal ->
+                 lower_than: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LT)
                  },
-                 NE: { signal ->
+                 not_eq: { int signal ->
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
-                 }]
+                 },
+                 eq: { SIGNAL signal ->
+                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
+                 },
+                 not_eq: { SIGNAL signal ->
+                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
+                 }
+                ]
             }]
         }]
     }
