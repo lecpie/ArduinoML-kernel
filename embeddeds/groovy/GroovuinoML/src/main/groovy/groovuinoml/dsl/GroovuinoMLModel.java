@@ -5,11 +5,10 @@ import java.util.*;
 
 import groovy.lang.Binding;
 import io.github.mosser.arduinoml.kernel.App;
-import io.github.mosser.arduinoml.kernel.behavioral.Action;
-import io.github.mosser.arduinoml.kernel.behavioral.State;
-import io.github.mosser.arduinoml.kernel.behavioral.Transition;
+import io.github.mosser.arduinoml.kernel.behavioral.*;
 import io.github.mosser.arduinoml.kernel.generator.ToWiring;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
+import io.github.mosser.arduinoml.kernel.language.Expression;
 import io.github.mosser.arduinoml.kernel.lib.Library;
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse;
 import io.github.mosser.arduinoml.kernel.lib.Measure;
@@ -25,6 +24,15 @@ public class GroovuinoMLModel {
 
     private List<Brick> bricks;
     private List<State> states;
+
+    public State getInitialState() {
+        return initialState;
+    }
+
+    public void setInitialState(State initialState) {
+        this.initialState = initialState;
+    }
+
     private State initialState;
     private Map<String, Library> loaded_librairies = new HashMap<>();
     private Map<String, Measure> loaded_measures = new HashMap<>();
@@ -73,20 +81,23 @@ public class GroovuinoMLModel {
     }
 
 
-    public void createPinnedSensor(String name, Integer pinNumber) {
+    public void createPinnedSensor(String name, Integer pinNumber, boolean analog) {
         PinnedSensor sensor = new PinnedSensor();
         sensor.setName(name);
         sensor.setPin(pinNumber);
+        sensor.setAnalogMode(analog);
         this.bricks.add(sensor);
         this.binding.setVariable(name, sensor);
 //		System.out.println("> sensor " + name + " on pin " + pinNumber);
 
     }
 
-    public void createActuator(String name, Integer pinNumber) {
+    public void createActuator(String name, Integer pinNumber, boolean analog) {
+
         PinnedActuator actuator = new PinnedActuator();
         actuator.setName(name);
-        //actuator.setPin(pinNumber);
+        actuator.setPin(pinNumber);
+        actuator.setAnalogMode(analog);
         this.bricks.add(actuator);
         this.binding.setVariable(name, actuator);
     }
@@ -102,8 +113,13 @@ public class GroovuinoMLModel {
     public void createTransition(State from, State to, PinnedSensor sensor, SIGNAL value) {
         Transition transition = new Transition();
         transition.setNext(to);
-        //transition.setSensor(sensor);
-        //transition.setValue(value);
+
+        Condition condition = new Condition();
+        condition.setLeft(sensor);
+        condition.setOperator(Operator.EQ);
+        condition.setRight(new DigitalExpression((value == SIGNAL.HIGH) ? true : false));
+        transition.setCondition(condition);
+
         from.setTransition(transition);
     }
 
@@ -116,6 +132,22 @@ public class GroovuinoMLModel {
         }
     }
 
+    public Expression createExpression(SIGNAL value) {
+        return new DigitalExpression(value == SIGNAL.HIGH);
+    }
+
+    public Expression createExpression(int value) {
+        return new IntegerExpression(value);
+    }
+
+    public Condition createCondition(Expression left, Operator operator, Expression right) {
+        Condition condition = new Condition();
+        condition.setLeft(left);
+        condition.setOperator(operator);
+        condition.setRight(right);
+
+        return condition;
+    }
 
     public void createMeasureUse(String libUseName, String measureName, Map<String, String> argsValues) {
         MeasureUse measureUse = new MeasureUse();

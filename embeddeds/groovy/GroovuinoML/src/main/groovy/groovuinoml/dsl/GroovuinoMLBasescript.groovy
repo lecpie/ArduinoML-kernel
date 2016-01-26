@@ -1,12 +1,18 @@
 package main.groovy.groovuinoml.dsl
 
+
 import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
+import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
 import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.lib.Library
+import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
+import io.github.mosser.arduinoml.kernel.lib.MeasureUse
+import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
-import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
+import main.groovy.groovuinoml.init_dsl.InitialisationDSL
+import sun.misc.Signal;
 
 
 abstract class GroovuinoMLBasescript extends Script {
@@ -16,6 +22,7 @@ abstract class GroovuinoMLBasescript extends Script {
 	}
 
 	def uselib(String libName){
+        /*
         Map<String, String> args = new LinkedHashMap<String,String>()
         ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
         def closure
@@ -24,6 +31,25 @@ abstract class GroovuinoMLBasescript extends Script {
                 args.put(key, val)
                 println("uselib : libname "+key+" "+val+" size : "+((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
                 [and: closure]
+        }]
+        */
+
+        GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
+
+        LibraryUse libraryUse = new LibraryUse();
+        Library usedLibrary =  model.getLoaded_librairies().get(libName)
+
+
+        def closure
+        [measure: closure = { name ->
+            Measure measure = usedLibrary.getMeasures().get(name)
+            [named: { measureName ->
+                MeasureUse measureUse = new MeasureUse()
+                measureUse.setName(measureName)
+
+                model.getUsedMeasure().add(measureName)
+                model.get
+            }]
         }]
 	}
 
@@ -53,15 +79,23 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	}
 
-	/*
+
 	// sensor "name" pin n
 	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
+        [analogPin: { n ->
+            ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n, true)
+        },
+        digitalPin: { n ->
+            ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createPinnedSensor(name, n, false)
+        }]
 	}
 
 	// actuator "name" pin n
 	def actuator(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
+		[
+                digitalPin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n, false)},
+                analogPin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n, true)}
+        ]
 	}
 	
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
@@ -74,7 +108,7 @@ abstract class GroovuinoMLBasescript extends Script {
 			[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)
-				action.setValue(signal)
+                action.setSignalExpression(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createExpression(signal))
 				actions.add(action)
 				[and: closure]
 			}]
@@ -103,5 +137,5 @@ abstract class GroovuinoMLBasescript extends Script {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
 
-	*/
+
 }

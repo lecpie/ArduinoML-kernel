@@ -18,8 +18,8 @@ class GroovuinoMLDSL {
 
 		// FIXME: variable current de lib??
 		
-	//	binding.setVariable("high", SIGNAL.HIGH)
-	//	binding.setVariable("low", SIGNAL.LOW)
+	binding.setVariable("high", SIGNAL.HIGH)
+	binding.setVariable("low", SIGNAL.LOW)
 	}
 	
 	void eval(File scriptFile) {

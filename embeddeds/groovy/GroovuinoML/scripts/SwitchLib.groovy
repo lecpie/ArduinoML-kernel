@@ -1,3 +1,8 @@
+importlib "scripts/DefLibs"
+
+
+
+uselib "DHT" measure "Measure1"
 sensor "button" digitalPin 9
 actuator "led1" analogPin 12
 actuator "led2" digitalPin 13
