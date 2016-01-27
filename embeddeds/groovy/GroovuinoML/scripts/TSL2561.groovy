@@ -1,28 +1,10 @@
-/**
- * Created by lecpie on 1/26/16.
- */
 
 deflib "TSL2561"
 includes "Wire.h" and "Digital_Light_TSL2561.h"
-setup "Wire.begin();"
+setup "Wire.begin();" and "TSL2561.init();" and "Serial.begin(9600);"
 
 defmeasure "light"
 variables "light"
 global "int light;"
-update "light = (int) TSL2561.readVisibleLux();"
+update "light = (int) TSL2561.readVisibleLux();" and "Serial.println(light);"
 reads "light"
-
-/*
-withlib() includes "Wire.h" and "Digital_Light_TSL2561.h"
-withlib() setup "Wire.begin();"
-exportlib "TSL2561"
-
-withmeasure() type("INTEGER")
-withmeasure() variables "light"
-withmeasure() global "int light;"
-withmeasure() update "light = (int) TSL2561.readVisibleLux();"
-withmeasure() read "light"
-exportmeasure "light"
-
-associate "light","TSL2561"
-*/

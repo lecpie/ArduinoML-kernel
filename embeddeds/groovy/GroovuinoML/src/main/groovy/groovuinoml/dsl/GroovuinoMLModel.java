@@ -129,7 +129,7 @@ public class GroovuinoMLModel {
         from.setTransition(transition);
     }
 
-    public void createTransition(State from, State to, PinnedSensor sensor, int value, Operator op) {
+    public void createTransition(State from, State to, Expression sensor, int value, Operator op) {
         Transition transition = new Transition();
         transition.setNext(to);
 

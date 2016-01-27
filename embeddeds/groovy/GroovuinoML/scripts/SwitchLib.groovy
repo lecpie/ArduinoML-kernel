@@ -3,17 +3,14 @@ importlib "scripts/TSL2561.groovy"
 uselib "TSL2561"
 usemeasure "light" named "thelight"
 
-sensor "button" digitalPin 9
-actuator "led1" analogPin 12
-actuator "led2" digitalPin 13
-actuator "led3" analogPin 14
+actuator "led1" digitalPin 9
 
-state "on" means led1 becomes 250
-state "off" means led1 becomes 500 and led2 becomes low and led3 becomes 0
+state "on" means led1 becomes high
+state "off" means led1 becomes low
 
 initial off
 
-from on to off when thelight eq high
-from off to on when button eq high
+from on to off when thelight greater_than 1
+from off to on when thelight lower_than 10
 
 export "UseLibs!"
