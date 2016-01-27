@@ -8,6 +8,7 @@ import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse
+import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 
 
 abstract class GroovuinoMLBasescript extends Script {
@@ -133,7 +134,6 @@ abstract class GroovuinoMLBasescript extends Script {
                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
                 },
                  greater_eq: { int signal ->
-                     // println("cc")
                      ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GE)
                  },
                  greater_than: { int signal ->
