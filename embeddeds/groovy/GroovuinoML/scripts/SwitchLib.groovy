@@ -13,7 +13,7 @@ state "off" means led1 becomes 500 and led2 becomes low and led3 becomes 0
 
 initial off
 
-from on to off when thelight EQ high
-from off to on when button EQ high
+from on to off when thelight eq high
+from off to on when button eq high
 
 export "UseLibs!"
