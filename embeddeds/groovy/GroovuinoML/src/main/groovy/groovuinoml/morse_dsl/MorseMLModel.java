@@ -137,6 +137,7 @@ public class MorseMLModel {
         app.setName(appName);
         app.setBricks(Arrays.asList(this.brick));
         app.setStates(Arrays.asList(this.state));
+        app.setInitial(state);
         Visitor codeGenerator = new ToWiring();
         app.accept(codeGenerator);
         return codeGenerator.getResult();

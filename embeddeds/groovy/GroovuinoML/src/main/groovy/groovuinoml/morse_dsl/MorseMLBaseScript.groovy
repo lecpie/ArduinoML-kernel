@@ -33,20 +33,20 @@ abstract class MorseMLBaseScript extends Script {
         off.setSignalExpression(new DigitalExpression(false));
 
         Sleep shortSleep = new Sleep();
-        shortSleep.setDelay(200);
+        shortSleep.setDelay(500);
 
         Sleep longSleep = new Sleep();
-        longSleep.setDelay(500);
+        longSleep.setDelay(1000);
 
 
         message = message.toLowerCase()
         ((MorseMLBinding)this.getBinding()).getMorseMLModel().encodeMessage(message)
         for( Morse_Type type :((MorseMLBinding)this.getBinding()).getMorseMLModel().getMorse_answer()){
                 if(type.equals(Morse_Type.LONG_MORSE)){
-                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, longSleep, off)
+                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, longSleep, off, shortSleep)
                 }
                 else if(type.equals(Morse_Type.SHORT_MORSE)){
-                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, shortSleep, off)
+                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, shortSleep, off, shortSleep)
 
                 }
                     else if (type.equals(Morse_Type.SILENCE_MORSE)) {
