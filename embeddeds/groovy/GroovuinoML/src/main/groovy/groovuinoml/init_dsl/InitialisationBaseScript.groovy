@@ -14,7 +14,117 @@ abstract public class InitialisationBaseScript extends Script{
     Library current_librairy = new Library();
     Measure current_measure = new Measure();
 
+    boolean isLib = true
+
     //FIXME : NOM UNIQUE AUX LIBRARY + MEASURE A L'AJOUT????
+
+    def deflib(String name) {
+        current_librairy = new Library()
+        current_librairy.setName(name)
+        ((InitialisationBinding)this.getBinding()).getInitialisationModel().getLibraries().add(current_librairy)
+
+        isLib = true
+    }
+
+    def defmeasure(String name) {
+        current_measure = new Measure()
+        current_measure.setName(name)
+        current_measure.setLibrary(current_librairy)
+        current_librairy.getMeasures().put(name, current_measure)
+        ((InitialisationBinding)this.getBinding()).getInitialisationModel().getMeasures().add(current_measure)
+
+        isLib = false
+    }
+
+    def reads(String readExpression) {
+        if (isLib) return
+
+        current_measure.setReadExpressionString(readExpression)
+    }
+
+    def setup (String first) {
+        if (isLib) {
+            current_librairy.getSetupInstructions().add(first)
+
+            def libsetup
+            [and: libsetup = { String other ->
+                current_librairy.getSetupInstructions().add(other)
+                [and: libsetup]
+            }]
+        }
+        else {
+            current_measure.getSetupInstructions().add(first)
+
+            def meassetup
+            [and: meassetup = { String other ->
+                current_measure.getSetupInstructions().add(other)
+                [and: meassetup]
+            }]
+        }
+    }
+
+    def variables (String first) {
+        List <String> varref = (isLib ? current_librairy.getVariables() : current_measure.getVariables())
+
+        varref.add(first)
+
+        [and: {
+            String next ->
+                varref.add(next)
+        }]
+    }
+
+    def global(String first) {
+        List <String> instrref = (isLib ? current_librairy.getGlobalInstructions() : current_measure.getGlobalInstructions())
+
+        instrref.add(first)
+
+        def libclosure
+        [and: libclosure = { String other ->
+            instrref.add(other)
+            [and: libclosure]
+        }]
+    }
+
+    def args(String firstkey) {
+
+        Map <String, String> argref = (isLib ? current_librairy.getDefaultArgs() : current_measure.getDefaultArgs())
+
+        [valued: {
+            String firstValue -> argref.put(firstkey, firstValue)
+                [and: {
+                    String key ->
+                        [valued: {
+                            String value ->
+                                argref.put(key, value)
+                        }]
+                }]
+        }]
+    }
+
+    def includes(String first) {
+
+        if (! isLib) return
+
+        current_librairy.getIncludes().add(first)
+
+        def libclosure
+        [and: libclosure = { String other ->
+            current_librairy.getIncludes().add(other)
+            [and: libclosure]
+        }]
+    }
+
+    def update(String update) {
+        if (isLib) return
+
+        current_measure.getUpdateInstructions().add(update)
+
+        [and: {
+            String next ->
+                current_measure.getUpdateInstructions().add(next)
+        }]
+    }
 
     def withlib(){
 

@@ -8,6 +8,7 @@ import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse
 import io.github.mosser.arduinoml.kernel.lib.Measure
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse
+import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 
 
 abstract class GroovuinoMLBasescript extends Script {
