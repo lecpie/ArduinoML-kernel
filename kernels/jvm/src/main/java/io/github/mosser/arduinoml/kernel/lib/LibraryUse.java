@@ -2,6 +2,7 @@ package io.github.mosser.arduinoml.kernel.lib;
 
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 import io.github.mosser.arduinoml.kernel.language.Global;
+import io.github.mosser.arduinoml.kernel.language.Setupable;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * Created by lecpie on 1/15/16.
  */
-public class LibraryUse implements Global {
+public class LibraryUse implements Global, Setupable {
     private Library library;
     private Map <String, String> argsValues = new LinkedHashMap<>();
 
@@ -43,5 +44,10 @@ public class LibraryUse implements Global {
     @Override
     public void global(Visitor visitor) {
         visitor.global(this);
+    }
+
+    @Override
+    public void setup(Visitor visitor) {
+        visitor.setup(this);
     }
 }

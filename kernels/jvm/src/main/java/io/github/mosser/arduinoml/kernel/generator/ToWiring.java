@@ -64,12 +64,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("// Wiring code generated from an ArduinoML model");
 		w(String.format("// Application name: %s\n", app.getName()));
 
-		// Provide api for lib definition
-		w("// API for Library definition");
-		w("#define AML_PASTE(A,B) A ## _ ## B");
-		w("#define AML_EVAL(A,B) AML_PASTE(LIB, MEASURE, INDEX)");
-		w("#define AML_CAT(A,B) AML_EVAL(A,B)");
-
 		int ctr = 0;
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
 			Library lib = usedlib.getLibrary();
@@ -120,6 +114,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 
 		w("void setup(){");
+
+		for (LibraryUse libraryUse : app.getUsedLibraries()) {
+			libraryUse.setup(this);
+		}
+
 		for(Brick brick: app.getBricks()){
 			brick.setup(this);
 		}
@@ -224,6 +223,9 @@ public class ToWiring extends Visitor<StringBuffer> {
 
     @SafeVarargs
     private final void instructions(List<String> instructions , Map <String, String>  ... args) {
+		// Try to pollute a bit less
+		if (instructions.size() == 0) return;
+
         loadArgs(args);
 
         for (String instruction : instructions) {
