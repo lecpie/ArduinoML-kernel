@@ -149,7 +149,6 @@ abstract class GroovuinoMLBasescript extends Script {
                 }
                 else {
                     ConditionTree next = new ConditionTree()
-                    conditionTree.setNextOperator(BinaryOperator.AND)
                     conditionTree.setNext(next)
                     conditionTree = next
                 }
@@ -159,32 +158,107 @@ abstract class GroovuinoMLBasescript extends Script {
                     conditionTree.setOperator(Operator.EQ)
                     conditionTree.setRight(new IntegerExpression(signal))
 
+                    [and: { nextsensor ->
+                        conditionTree.setNextOperator(BinaryOperator.AND)
+                        conditionClosure(nextsensor)
+                    },
+                     or : {
+                         nextsensor ->
+                             conditionTree.setNextOperator(BinaryOperator.OR)
+                             conditionClosure(nextsensor)
+                     }
+                    ]
+
                 },
                  greater_eq: { int signal ->
                      conditionTree.setOperator(Operator.GE)
                      conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
                  greater_than: { int signal ->
                      conditionTree.setOperator(Operator.GT)
                      conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
                  lower_eq: { int signal ->
                      conditionTree.setOperator(Operator.LE)
                      conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
                  lower_than: { int signal ->
                      conditionTree.setOperator(Operator.LT)
                      conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
                  not_eq: { int signal ->
                      conditionTree.setOperator(Operator.NE)
                      conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
                  eq: { SIGNAL signal ->
                      conditionTree.setOperator(Operator.EQ)
                      conditionTree.setRight(new DigitalExpression(signal == high ? true : false))
 
-                     [and: conditionClosure]
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                     or : {
+                         nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.OR)
+                         conditionClosure(nextsensor)
+                     }
+                     ]
 
                  },
                  not_eq: { SIGNAL signal ->
