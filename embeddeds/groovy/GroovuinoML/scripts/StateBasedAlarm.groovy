@@ -1,9 +1,8 @@
-sensor   "button1" digitalPin 1
-actuator "button2" digitalPin 2
-actuator "led"     digitalPin 3
+sensor   "button" digitalPin 1
+actuator "led"    digitalPin 2
 
 state "on"  means led becomes high
-state "off" means led becomes low
+state "off" means led becomes high
 
 initial off
 
