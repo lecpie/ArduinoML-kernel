@@ -22,6 +22,7 @@ public abstract class Visitor<T> {
 
 	public abstract void visit(Operator operator);
 	public abstract void visit(Condition condition);
+	public abstract void visit(ConditionTree conditionTree);
 
 	public abstract void expression (PrimitiveExpression e);
 	public abstract void expression (DigitalExpression e);

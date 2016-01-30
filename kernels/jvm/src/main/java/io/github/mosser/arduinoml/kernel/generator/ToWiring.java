@@ -162,11 +162,70 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(Condition condition) {
-		condition.getLeft().expression(this);
-		add(" ");
-		condition.getOperator().accept(this);
-		add(" ");
-		condition.getRight().expression(this);
+
+		if (condition.getLeft().getType() != condition.getRight().getType()) {
+			throw new CompilationError("type mismatch : " + condition.getLeft() + " is " + condition.getLeft().getType()
+			                           + " but " + condition.getRight() + " is " + condition.getRight().getType());
+		}
+
+		switch (condition.getLeft().getType()) {
+			case DIGITAL:
+				switch (condition.getOperator()) {
+					case EQ:
+					case NE:
+						break;
+
+					default:
+						throw new CompilationError("Comparison " + condition.getOperator() + " not allowed on types " + condition.getLeft().getType());
+				}
+
+			case REAL:
+			case INTEGER:
+				condition.getLeft().expression(this);
+				add(" ");
+				condition.getOperator().accept(this);
+				add(" ");
+				condition.getRight().expression(this);
+
+				break;
+
+			case STRING:
+				switch (condition.getOperator()) {
+					case EQ:
+					case NE:
+						break;
+
+					default:
+						throw new CompilationError("Comparison " + condition.getOperator() + " not allowed on types " + condition.getLeft().getType());
+				}
+
+				//TODO String comparison strcmp
+
+		}
+
+
+	}
+
+	@Override
+	public void visit(ConditionTree conditionTree) {
+		this.visit((Condition)conditionTree);
+
+		if (conditionTree.getNextOperator() == null || conditionTree.getNext() == null) return;
+
+		switch (conditionTree.getNextOperator()) {
+			case AND:
+				add (" && ");
+				break;
+			case OR:
+				add(" || ");
+				break;
+
+			default:
+				throw new CompilationError("Operator not supported for conditions : " + conditionTree.getNextOperator());
+		}
+
+		conditionTree.getNext().accept(this);
+
 	}
 
 	@Override
@@ -274,7 +333,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 				   measureUse                .getArgsValues());
     }
 
-    @Override
+	@Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Actionable action: state.getActions()) {
@@ -304,9 +363,9 @@ public class ToWiring extends Visitor<StringBuffer> {
 			((Updatable) right).update(this);
 		}
 
-		add("if (");
+		add("if ((");
 		transition.getCondition().accept(this);
-		w(" && guard) {");
+		w(") && guard) {");
 
 		w("    time = millis();");
 		w(String.format("    state_%s();",transition.getNext().getName()));

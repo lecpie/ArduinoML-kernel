@@ -9,10 +9,6 @@ public class Transition implements Visitable {
 
 	Condition condition;
 
-	// private PinnedSensor sensor;
-	// private SIGNAL value;
-
-
 	public State getNext() {
 		return next;
 	}
@@ -20,26 +16,6 @@ public class Transition implements Visitable {
 	public void setNext(State next) {
 		this.next = next;
 	}
-
-	/*
-
-	public PinnedSensor getSensor() {
-		return sensor;
-	}
-
-	//public void setSensor(PinnedSensor sensor) {
-		this.sensor = sensor;
-	}
-
-	public SIGNAL getValue() {
-		return value;
-	}
-
-	public void setValue(SIGNAL value) {
-		this.value = value;
-	}
-
-	*/
 
 	public Condition getCondition() {
 		return condition;

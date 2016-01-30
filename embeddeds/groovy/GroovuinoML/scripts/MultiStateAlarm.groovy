@@ -6,7 +6,7 @@ state "active"  means led becomes low
 state "alarm" means buzzer becomes high
 state "safety" means buzzer becomes low and led becomes high
 
-initial off
+initial active
 
 from active to alarm  when button eq high
 from alarm  to safety when button eq high
