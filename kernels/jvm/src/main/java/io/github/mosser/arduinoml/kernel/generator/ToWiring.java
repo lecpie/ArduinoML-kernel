@@ -71,6 +71,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 			usedlib.getArgsValues().put(AML_LIBRARY_INSTANCE, Integer.toString(ctr++));
 			usedlib.loadDefaults();
 
+			// Check required args
+			for (String arg : usedlib.getLibrary().getRequiredArgs()) {
+				if (!usedlib.getArgsValues().containsKey(arg)) {
+					throw new CompilationError("Argument " + arg + " expected for library " + usedlib.getLibrary().getName());
+				}
+			}
+
 			librarysym.put(usedlib, new HashMap<>());
 			for (String var : lib.getVariables()) {
 				int isym = nextsym++;
@@ -92,9 +99,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 				MeasureUse measureUse = ((MeasureUse) brick);
 				Measure measure = measureUse.getMeasure();
 
-				// Maintain this variable for measure instances
-				measureUse.getArgsValues().put(AML_MEASURE_INSTANCE, Integer.toString(ctr++));
 				measureUse.loadDefaults();
+
+				// Check required args
+				for (String arg : measure.getRequiredArgs()) {
+					if (!measureUse.getArgsValues().containsKey(arg)) {
+						throw new CompilationError("Argument " + arg + " expected for measure " + measure.getName());
+					}
+				}
 
 				measuresym.put(measureUse, new HashMap<>());
 				for (String var : measure.getVariables()) {

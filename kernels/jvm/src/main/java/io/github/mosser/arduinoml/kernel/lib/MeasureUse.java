@@ -1,5 +1,6 @@
 package io.github.mosser.arduinoml.kernel.lib;
 
+import io.github.mosser.arduinoml.kernel.CompilationError;
 import io.github.mosser.arduinoml.kernel.behavioral.Type;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 import io.github.mosser.arduinoml.kernel.language.Expression;

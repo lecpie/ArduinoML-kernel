@@ -1,11 +1,8 @@
-package main.groovy.groovuinoml.init_dsl;
+package main.groovy.groovuinoml.init_dsl
 
-import groovy.lang.Script
+import io.github.mosser.arduinoml.kernel.behavioral.Type;
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.Measure
-import main.groovy.groovuinoml.dsl.GroovuinoMLBinding
-
-import java.lang.reflect.Type;
 
 /**
  * Created by fofo on 16/01/16.
@@ -34,6 +31,10 @@ abstract public class InitialisationBaseScript extends Script{
         ((InitialisationBinding)this.getBinding()).getInitialisationModel().getMeasures().add(current_measure)
 
         isLib = false
+
+        [typed: { Type type ->
+            current_measure.setType(type)
+        }]
     }
 
     def reads(String readExpression) {
@@ -99,6 +100,20 @@ abstract public class InitialisationBaseScript extends Script{
                                 argref.put(key, value)
                         }]
                 }]
+        }]
+    }
+
+    def required(String firstname) {
+        List <String> reqlist = (isLib ? current_librairy.getRequiredArgs() : current_measure.getRequiredArgs());
+
+        reqlist.add(firstname)
+
+        def andclosure
+        [and : andclosure = {
+            String next ->
+                reqlist.add(next)
+
+                [and : andclosure]
         }]
     }
 
