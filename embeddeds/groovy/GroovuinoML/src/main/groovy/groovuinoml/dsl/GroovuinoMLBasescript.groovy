@@ -11,7 +11,6 @@ import io.github.mosser.arduinoml.kernel.behavioral.State
 import io.github.mosser.arduinoml.kernel.behavioral.Transition
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse
-import io.github.mosser.arduinoml.kernel.lib.Measure
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL
 
@@ -63,8 +62,6 @@ abstract class GroovuinoMLBasescript extends Script {
         [named: { String name ->
             measureUse.setName(name)
             binding.setVariable(measureUse.getName(), measureUse)
-            println("Das binding !")
-            println binding.getVariables()
             def closure
             [with: closure = {
                 String key ->
@@ -75,19 +72,6 @@ abstract class GroovuinoMLBasescript extends Script {
                     }]
             }]
         }]
-    }
-
-    def dump(String fuck) {
-        println("Libraries Loaded : ")
-        for (Map.Entry<String, Library> libraries : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_librairies) {
-            println("\t\t - " + libraries.key);
-            for (Map.Entry<String, Measure> measure : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_measures) {
-                if (measure.getValue().getLibrary().equals(libraries.value)) {
-                    println("\t\t\t\t\t (associate with) : " + measure.getKey());
-                }
-            }
-        }
-
     }
 
     // sensor "name" pin n

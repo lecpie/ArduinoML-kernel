@@ -22,9 +22,6 @@ import java.util.*;
  * Quick and dirty visitor to support the generation of Wiring code
  */
 public class ToWiring extends Visitor<StringBuffer> {
-	private final static String AML_LIBRARY_INSTANCE = "__ARDUINOML_LIBRARY_INSTANCE__";
-	private final static String AML_MEASURE_INSTANCE = "__ARDUINOML_MEASURE_INSTANCE__";
-
 	private final static String CURRENT_STATE = "current_state";
 
 	private Map <LibraryUse, Map <String, String> > librarysym = new HashMap<>();
@@ -68,7 +65,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
 			Library lib = usedlib.getLibrary();
 
-			usedlib.getArgsValues().put(AML_LIBRARY_INSTANCE, Integer.toString(ctr++));
 			usedlib.loadDefaults();
 
 			// Check required args
