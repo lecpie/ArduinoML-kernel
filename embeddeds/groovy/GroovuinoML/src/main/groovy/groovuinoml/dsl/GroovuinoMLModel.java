@@ -193,8 +193,6 @@ public class GroovuinoMLModel {
         app.setName(appName);
         app.setUsedLibraries(usedLibraries);
 
-        System.out.println("the used libs " + usedLibraries.size());
-
         app.setBricks(this.bricks);
         app.setStates(this.states);
         app.setInitial(this.initialState);

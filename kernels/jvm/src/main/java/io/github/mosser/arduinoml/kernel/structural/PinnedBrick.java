@@ -1,6 +1,9 @@
 package io.github.mosser.arduinoml.kernel.structural;
 
-public abstract class PinnedBrick extends Brick {
+import io.github.mosser.arduinoml.kernel.behavioral.Type;
+import io.github.mosser.arduinoml.kernel.language.Typed;
+
+public abstract class PinnedBrick extends Brick implements Typed {
     private int pin;
     private boolean analogMode;
 
@@ -18,5 +21,9 @@ public abstract class PinnedBrick extends Brick {
 
     public void setAnalogMode(boolean analogMode) {
         this.analogMode = analogMode;
+    }
+
+    public Type getType() {
+        return isAnalogMode() ? Type.INTEGER : Type.DIGITAL;
     }
 }

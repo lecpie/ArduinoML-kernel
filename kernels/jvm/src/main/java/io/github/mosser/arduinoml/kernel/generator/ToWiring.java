@@ -22,9 +22,6 @@ import java.util.*;
  * Quick and dirty visitor to support the generation of Wiring code
  */
 public class ToWiring extends Visitor<StringBuffer> {
-	private final static String AML_LIBRARY_INSTANCE = "__ARDUINOML_LIBRARY_INSTANCE__";
-	private final static String AML_MEASURE_INSTANCE = "__ARDUINOML_MEASURE_INSTANCE__";
-
 	private final static String CURRENT_STATE = "current_state";
 
 	private Map <LibraryUse, Map <String, String> > librarysym = new HashMap<>();
@@ -68,8 +65,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 		for (LibraryUse usedlib : app.getUsedLibraries()) {
 			Library lib = usedlib.getLibrary();
 
-			usedlib.getArgsValues().put(AML_LIBRARY_INSTANCE, Integer.toString(ctr++));
 			usedlib.loadDefaults();
+
+			// Check required args
+			for (String arg : usedlib.getLibrary().getRequiredArgs()) {
+				if (!usedlib.getArgsValues().containsKey(arg)) {
+					throw new CompilationError("Argument " + arg + " expected for library " + usedlib.getLibrary().getName());
+				}
+			}
 
 			librarysym.put(usedlib, new HashMap<>());
 			for (String var : lib.getVariables()) {
@@ -92,9 +95,14 @@ public class ToWiring extends Visitor<StringBuffer> {
 				MeasureUse measureUse = ((MeasureUse) brick);
 				Measure measure = measureUse.getMeasure();
 
-				// Maintain this variable for measure instances
-				measureUse.getArgsValues().put(AML_MEASURE_INSTANCE, Integer.toString(ctr++));
 				measureUse.loadDefaults();
+
+				// Check required args
+				for (String arg : measure.getRequiredArgs()) {
+					if (!measureUse.getArgsValues().containsKey(arg)) {
+						throw new CompilationError("Argument " + arg + " expected for measure " + measure.getName());
+					}
+				}
 
 				measuresym.put(measureUse, new HashMap<>());
 				for (String var : measure.getVariables()) {
@@ -162,11 +170,70 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(Condition condition) {
-		condition.getLeft().expression(this);
-		add(" ");
-		condition.getOperator().accept(this);
-		add(" ");
-		condition.getRight().expression(this);
+
+		if (condition.getLeft().getType() != condition.getRight().getType()) {
+			throw new CompilationError("type mismatch : " + condition.getLeft() + " is " + condition.getLeft().getType()
+			                           + " but " + condition.getRight() + " is " + condition.getRight().getType());
+		}
+
+		switch (condition.getLeft().getType()) {
+			case DIGITAL:
+				switch (condition.getOperator()) {
+					case EQ:
+					case NE:
+						break;
+
+					default:
+						throw new CompilationError("Comparison " + condition.getOperator() + " not allowed on types " + condition.getLeft().getType());
+				}
+
+			case REAL:
+			case INTEGER:
+				condition.getLeft().expression(this);
+				add(" ");
+				condition.getOperator().accept(this);
+				add(" ");
+				condition.getRight().expression(this);
+
+				break;
+
+			case STRING:
+				switch (condition.getOperator()) {
+					case EQ:
+					case NE:
+						break;
+
+					default:
+						throw new CompilationError("Comparison " + condition.getOperator() + " not allowed on types " + condition.getLeft().getType());
+				}
+
+				//TODO String comparison strcmp
+
+		}
+
+
+	}
+
+	@Override
+	public void visit(ConditionTree conditionTree) {
+		this.visit((Condition)conditionTree);
+
+		if (conditionTree.getNextOperator() == null || conditionTree.getNext() == null) return;
+
+		switch (conditionTree.getNextOperator()) {
+			case AND:
+				add (" && ");
+				break;
+			case OR:
+				add(" || ");
+				break;
+
+			default:
+				throw new CompilationError("Operator not supported for conditions : " + conditionTree.getNextOperator());
+		}
+
+		conditionTree.getNext().accept(this);
+
 	}
 
 	@Override
@@ -274,7 +341,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 				   measureUse                .getArgsValues());
     }
 
-    @Override
+	@Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Actionable action: state.getActions()) {
@@ -282,7 +349,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 		w("  boolean guard = millis() - time > debounce;");
 		context.put(CURRENT_STATE, state);
-		state.getTransition().accept(this);
+
+		if (state.getTransition() != null) {
+			state.getTransition().accept(this);
+		}
+
 		w("}\n");
 
 	}
@@ -300,9 +371,9 @@ public class ToWiring extends Visitor<StringBuffer> {
 			((Updatable) right).update(this);
 		}
 
-		add("if (");
+		add("if ((");
 		transition.getCondition().accept(this);
-		w(" && guard) {");
+		w(") && guard) {");
 
 		w("    time = millis();");
 		w(String.format("    state_%s();",transition.getNext().getName()));
