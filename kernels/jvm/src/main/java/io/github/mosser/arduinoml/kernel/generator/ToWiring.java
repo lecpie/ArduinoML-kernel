@@ -216,7 +216,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(ConditionTree conditionTree) {
-		this.visit((Condition)conditionTree);
+		this.visit((Condition) conditionTree);
 
 		if (conditionTree.getNextOperator() == null || conditionTree.getNext() == null) return;
 
@@ -372,7 +372,12 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 
 		add("if ((");
-		transition.getCondition().accept(this);
+		if (transition.getCondition() == null) {
+			add("true");
+		}
+		else {
+			transition.getCondition().accept(this);
+		}
 		w(") && guard) {");
 
 		w("    time = millis();");
