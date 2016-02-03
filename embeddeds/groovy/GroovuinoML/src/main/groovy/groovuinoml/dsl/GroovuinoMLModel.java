@@ -22,13 +22,6 @@ import main.groovy.groovuinoml.init_dsl.InitialisationDSL;
 
 
 public class GroovuinoMLModel {
-    public List<Brick> getBricks() {
-        return bricks;
-    }
-
-    public void setBricks(List<Brick> bricks) {
-        this.bricks = bricks;
-    }
 
     private List<Brick> bricks;
     private List<State> states;
@@ -97,9 +90,11 @@ public class GroovuinoMLModel {
         this.bricks.add(sensor);
         this.binding.setVariable(name, sensor);
 //		System.out.println("> sensor " + name + " on pin " + pinNumber);
+
     }
 
     public void createActuator(String name, Integer pinNumber, boolean analog) {
+
         PinnedActuator actuator = new PinnedActuator();
         actuator.setName(name);
         actuator.setPin(pinNumber);
