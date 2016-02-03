@@ -12,9 +12,7 @@ import io.github.mosser.arduinoml.kernel.language.Actionable;
 import io.github.mosser.arduinoml.kernel.structural.Brick;
 import io.github.mosser.arduinoml.kernel.structural.PinnedActuator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -30,18 +28,18 @@ public class MorseMLModel {
         this.brick = brick;
     }
 
-    public State getState() {
-        return state;
+    public List<State> getStates() {
+        return this.states;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setStates(List<State> states) {
+        this.states = states;
     }
 
     private Brick brick;
-    private State state;
+    private List<State> states;
     private MorseAlphabet morseAlphabet;
-    private List<Morse_Type> morse_answer;
+    private LinkedHashMap<Character,Collection<Morse_Type>> morse_answer;
 
     public List<Actionable> getActions() {
         return actions;
@@ -54,31 +52,65 @@ public class MorseMLModel {
     private List <Actionable> actions;
     private Binding binding;
 
-    public List<Morse_Type> getMorse_answer() {
+    public LinkedHashMap<Character,Collection<Morse_Type>> getMorse_answer() {
         return morse_answer;
     }
 
     public MorseMLModel(Binding binding) {
-        this.state = new State();
+        this.states = new  ArrayList<>();
         actions = new ArrayList<>();
-        state.setName("morse");
-        state.setActions(actions);
         this.brick = new PinnedActuator();
         this.morseAlphabet = new MorseAlphabet();
-        this.morse_answer = new ArrayList<>();
+        this.morse_answer = new LinkedHashMap<>();
         this.binding = binding;
     }
     public void encodeMessage(String message){
 
+
+        Action on = new Action();
+        on.setActuator((PinnedActuator)(this.brick));
+        on.setSignalExpression(new DigitalExpression(true));
+
+        Action off = new Action();
+        off.setActuator((PinnedActuator)(this.brick));
+        off.setSignalExpression(new DigitalExpression(false));
+
+        Sleep shortSleep = new Sleep();
+        shortSleep.setDelay(500);
+
+        Sleep longSleep = new Sleep();
+        longSleep.setDelay(1000);
+
+
         for(int i=0;i<message.toCharArray().length;i++){
             if(message.toCharArray()[i]==' '){
-                this.morse_answer.add(Morse_Type.SILENCE_MORSE);
+                this.morse_answer.put(message.toCharArray()[i], Arrays.asList(Morse_Type.SILENCE_MORSE));
             }
             else{
-                for(Morse_Type t : this.morseAlphabet.getListByLetter(message.toCharArray()[i])){
-                    this.morse_answer.add(t);
-                 }
+                this.morse_answer.put(message.toCharArray()[i], this.morseAlphabet.getListByLetter(message.toCharArray()[i]));
             }
+            State newState = new State();
+            newState.setName(message+"State"+i);
+            for(Morse_Type type : this.morseAlphabet.getListByLetter(message.toCharArray()[i])){
+                switch(type){
+                    case LONG_MORSE:
+                        newState.getActions().add(on);
+                        newState.getActions().add(longSleep);
+                        newState.getActions().add(off);
+                        newState.getActions().add(shortSleep);
+                        break;
+                    case SHORT_MORSE:
+                        newState.getActions().add(on);
+                        newState.getActions().add(shortSleep);
+                        newState.getActions().add(off);
+                        newState.getActions().add(shortSleep);
+                        break;
+                    case SILENCE_MORSE:
+                        newState.getActions().add(longSleep);
+                        break;
+                }
+            }
+            this.states.add(newState);
         }
     }
 /*
@@ -136,8 +168,8 @@ public class MorseMLModel {
         App app = new App();
         app.setName(appName);
         app.setBricks(Arrays.asList(this.brick));
-        app.setStates(Arrays.asList(this.state));
-        app.setInitial(state);
+        app.setStates(this.states);
+        app.setInitial(this.states.get(0));
         Visitor codeGenerator = new ToWiring();
         app.accept(codeGenerator);
         return codeGenerator.getResult();

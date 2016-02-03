@@ -24,38 +24,8 @@ abstract class MorseMLBaseScript extends Script {
     }
 
     def morse(String message){
-        Action on = new Action();
-        on.setActuator((PinnedActuator)((MorseMLBinding)this.getBinding()).getMorseMLModel().getBrick());
-        on.setSignalExpression(new DigitalExpression(true));
-
-        Action off = new Action();
-        off.setActuator((PinnedActuator)((MorseMLBinding)this.getBinding()).getMorseMLModel().getBrick());
-        off.setSignalExpression(new DigitalExpression(false));
-
-        Sleep shortSleep = new Sleep();
-        shortSleep.setDelay(500);
-
-        Sleep longSleep = new Sleep();
-        longSleep.setDelay(1000);
-
-
         message = message.toLowerCase()
-        ((MorseMLBinding)this.getBinding()).getMorseMLModel().encodeMessage(message)
-        for( Morse_Type type :((MorseMLBinding)this.getBinding()).getMorseMLModel().getMorse_answer()){
-                if(type.equals(Morse_Type.LONG_MORSE)){
-                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, longSleep, off, shortSleep)
-                }
-                else if(type.equals(Morse_Type.SHORT_MORSE)){
-                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(on, shortSleep, off, shortSleep)
-
-                }
-                    else if (type.equals(Morse_Type.SILENCE_MORSE)) {
-                    ((MorseMLBinding)this.getBinding()).getMorseMLModel().getActions().addAll(longSleep)
-                }
-                else{
-                    print(" ")
-                }
-        }
+        ((MorseMLBinding)this.getBinding()).getMorseMLModel().encodeMessage(message);
         println(((MorseMLBinding) this.getBinding()).getMorseMLModel().generateCode("MORSE").toString())
 
     }
