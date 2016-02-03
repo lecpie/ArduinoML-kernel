@@ -3,7 +3,7 @@ importlib "scripts/TSL2561.groovy"
 uselib "TSL2561"
 usemeasure "light" named "thelight"
 
-actuator "led1" digitalPin 9
+actuator "led1" digitalPin 12
 
 state "on" means led1 becomes high
 state "off" means led1 becomes low

@@ -3,6 +3,7 @@ package main.groovy.groovuinoml.init_dsl
 import io.github.mosser.arduinoml.kernel.behavioral.Type;
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.Measure
+import org.codehaus.groovy.syntax.SyntaxException
 
 /**
  * Created by fofo on 16/01/16.
@@ -60,6 +61,39 @@ abstract public class InitialisationBaseScript extends Script{
             [and: meassetup = { String other ->
                 current_measure.getSetupInstructions().add(other)
                 [and: meassetup]
+            }]
+        }
+    }
+
+    def variable_based(String varName) {
+        if (isLib) {
+            // Syntax error
+        }
+        else {
+            String typeName;
+
+            switch (current_measure.getType()) {
+                case Type.INTEGER:
+                    typeName = "int";
+                    break;
+                case Type.DIGITAL:
+                    typeName = "boolean";
+                    break;
+                case Type.REAL:
+                    typeName = "double";
+                    break;
+
+                default:
+                    // Syntax error
+                    throw new SyntaxException();
+            }
+
+            current_measure.getVariables().add(varName);
+            current_measure.getGlobalInstructions().add(typeName + " " + varName + ";");
+            current_measure.setReadExpressionString(varName);
+
+            [reads: { String instr ->
+                current_measure.getUpdateInstructions().add(varName + " = " + instr)
             }]
         }
     }

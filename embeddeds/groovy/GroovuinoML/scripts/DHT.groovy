@@ -6,11 +6,10 @@ global "DHT dht(dht_pin, dht_type);"
 setup "dht.begin();" and "Serial.begin(9600);"
 
 measure "temperature" typed integer
-global "int t;"
-variables "t"
 args "celcius" valued "false" and "fahrenheit" valued "false" and "format" valued "celcius"
-update "t = (int) dht.readTemperature(format);" and "Serial.println(t);"
-reads "t"
+variable_based "t" reads "dht.readTemperature(format);"
+
+// VS
 
 measure "humidity" typed integer
 global "int h;"
