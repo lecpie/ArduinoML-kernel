@@ -13,6 +13,8 @@ public class MorseAlphabet {
     static
     {
         morse_translation = new HashMap<Character, Collection<Morse_Type>>();
+        morse_translation.put(' ', Arrays.asList(SILENCE_MORSE));
+
         morse_translation.put('a', Arrays.asList(SHORT_MORSE,LONG_MORSE));
         morse_translation.put('b', Arrays.asList(LONG_MORSE, SHORT_MORSE,SHORT_MORSE,SHORT_MORSE));
         morse_translation.put('c', Arrays.asList(LONG_MORSE,SHORT_MORSE,LONG_MORSE,SHORT_MORSE));

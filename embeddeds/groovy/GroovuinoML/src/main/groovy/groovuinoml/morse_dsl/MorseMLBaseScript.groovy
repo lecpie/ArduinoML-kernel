@@ -18,7 +18,6 @@ abstract class MorseMLBaseScript extends Script {
 
         PinnedActuator actuator = new PinnedActuator();
         actuator.setPin(pin)
-
         ((MorseMLBinding)this.getBinding()).morseMLModel.brick = actuator;
 
     }

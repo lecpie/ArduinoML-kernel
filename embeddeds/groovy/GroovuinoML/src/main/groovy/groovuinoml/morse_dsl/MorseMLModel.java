@@ -2,10 +2,7 @@ package main.groovy.groovuinoml.morse_dsl;
 
 import groovy.lang.Binding;
 import io.github.mosser.arduinoml.kernel.App;
-import io.github.mosser.arduinoml.kernel.behavioral.Action;
-import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression;
-import io.github.mosser.arduinoml.kernel.behavioral.Sleep;
-import io.github.mosser.arduinoml.kernel.behavioral.State;
+import io.github.mosser.arduinoml.kernel.behavioral.*;
 import io.github.mosser.arduinoml.kernel.generator.ToWiring;
 import io.github.mosser.arduinoml.kernel.generator.Visitor;
 import io.github.mosser.arduinoml.kernel.language.Actionable;
@@ -39,29 +36,12 @@ public class MorseMLModel {
     private Brick brick;
     private List<State> states;
     private MorseAlphabet morseAlphabet;
-    private LinkedHashMap<Character,Collection<Morse_Type>> morse_answer;
-
-    public List<Actionable> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<Actionable> actions) {
-        this.actions = actions;
-    }
-
-    private List <Actionable> actions;
     private Binding binding;
-
-    public LinkedHashMap<Character,Collection<Morse_Type>> getMorse_answer() {
-        return morse_answer;
-    }
 
     public MorseMLModel(Binding binding) {
         this.states = new  ArrayList<>();
-        actions = new ArrayList<>();
         this.brick = new PinnedActuator();
         this.morseAlphabet = new MorseAlphabet();
-        this.morse_answer = new LinkedHashMap<>();
         this.binding = binding;
     }
     public void encodeMessage(String message){
@@ -81,16 +61,10 @@ public class MorseMLModel {
         Sleep longSleep = new Sleep();
         longSleep.setDelay(1000);
 
-
+        State previous = null;
         for(int i=0;i<message.toCharArray().length;i++){
-            if(message.toCharArray()[i]==' '){
-                this.morse_answer.put(message.toCharArray()[i], Arrays.asList(Morse_Type.SILENCE_MORSE));
-            }
-            else{
-                this.morse_answer.put(message.toCharArray()[i], this.morseAlphabet.getListByLetter(message.toCharArray()[i]));
-            }
             State newState = new State();
-            newState.setName(message+"State"+i);
+            newState.setName("State"+i);
             for(Morse_Type type : this.morseAlphabet.getListByLetter(message.toCharArray()[i])){
                 switch(type){
                     case LONG_MORSE:
@@ -111,6 +85,14 @@ public class MorseMLModel {
                 }
             }
             this.states.add(newState);
+
+            if (previous != null) {
+                Transition transition = new Transition();
+                transition.setNext(newState);
+                previous.setTransition(transition);
+            }
+
+            previous = newState;
         }
     }
 /*

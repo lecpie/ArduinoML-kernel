@@ -360,15 +360,18 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(Transition transition) {
-		Expression left = transition.getCondition().getLeft();
-		Expression right = transition.getCondition().getRight();
 
-		if (left instanceof Updatable) {
-			((Updatable) left).update(this);
-		}
+		if (transition.getCondition() != null) {
+			Expression left = transition.getCondition().getLeft();
+			Expression right = transition.getCondition().getRight();
 
-		if (right instanceof Updatable) {
-			((Updatable) right).update(this);
+			if (left instanceof Updatable) {
+				((Updatable) left).update(this);
+			}
+
+			if (right instanceof Updatable) {
+				((Updatable) right).update(this);
+			}
 		}
 
 		add("if ((");
