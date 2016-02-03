@@ -17,12 +17,4 @@ public class PinnedSensor extends PinnedBrick implements Expression {
 		visitor.expression(this);
 	}
 
-	@Override
-	public Type getType() {
-		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
-	}
 }

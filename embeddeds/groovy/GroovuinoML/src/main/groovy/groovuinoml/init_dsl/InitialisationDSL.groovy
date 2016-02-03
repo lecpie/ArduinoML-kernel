@@ -2,6 +2,7 @@ package main.groovy.groovuinoml.init_dsl;
 
 import groovy.lang.GroovyShell
 import groovy.lang.Script
+import io.github.mosser.arduinoml.kernel.behavioral.Type
 import main.groovy.groovuinoml.init_dsl.InitialisationBaseScript
 import main.groovy.groovuinoml.init_dsl.InitialisationBinding
 import main.groovy.groovuinoml.init_dsl.InitialisationModel
@@ -23,6 +24,9 @@ class InitialisationDSL {
         configuration = new CompilerConfiguration()
         configuration.setScriptBaseClass("main.groovy.groovuinoml.init_dsl.InitialisationBaseScript")
         shell = new GroovyShell(configuration)
+
+        binding.setVariable("integer",  Type.INTEGER)
+        binding.setVariable("digital",  Type.DIGITAL)
     }
 
     void eval(File scriptFile) {

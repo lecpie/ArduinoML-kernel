@@ -1,19 +1,18 @@
 package main.groovy.groovuinoml.dsl
 
 
-import com.sun.java.util.jar.pack.ConstantPool
 import io.github.mosser.arduinoml.kernel.behavioral.Action
+import io.github.mosser.arduinoml.kernel.behavioral.BinaryOperator
+import io.github.mosser.arduinoml.kernel.behavioral.ConditionTree
 import io.github.mosser.arduinoml.kernel.behavioral.DigitalExpression
+import io.github.mosser.arduinoml.kernel.behavioral.IntegerExpression
 import io.github.mosser.arduinoml.kernel.behavioral.Operator
 import io.github.mosser.arduinoml.kernel.behavioral.State
+import io.github.mosser.arduinoml.kernel.behavioral.Transition
 import io.github.mosser.arduinoml.kernel.lib.Library
 import io.github.mosser.arduinoml.kernel.lib.LibraryUse
-import io.github.mosser.arduinoml.kernel.lib.Measure
 import io.github.mosser.arduinoml.kernel.lib.MeasureUse
 import io.github.mosser.arduinoml.kernel.structural.SIGNAL
-import main.groovy.groovuinoml.init_dsl.InitialisationBinding
-import main.groovy.groovuinoml.init_dsl.InitialisationDSL
-import sun.misc.Signal;
 
 
 abstract class GroovuinoMLBasescript extends Script {
@@ -22,67 +21,57 @@ abstract class GroovuinoMLBasescript extends Script {
         ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().importlib(path)
     }
 
+    private LibraryUse current = null
 
 	def uselib(String libName){
-        /*
-        Map<String, String> args = new LinkedHashMap<String,String>()
-        ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLibraryUse(libName, args)
->>>>>>> 74e29604a90609c10a350175a8e33d8167e83ee8
-        def closure
-        [with: closure = {
-            String key, String val ->
-                args.put(key, val)
-                println("uselib : libname " + key + " " + val + " size : " + ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
-                [and: closure]
-        }]
-<<<<<<< HEAD
-    }
-=======
-        */
-
         GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
 
         LibraryUse libraryUse = new LibraryUse();
         Library usedLibrary =  model.getLoaded_librairies().get(libName)
+        libraryUse.setLibrary(usedLibrary)
+        Map <String, String> args = usedLibrary.getDefaultArgs()
 
-
-        def closure
-        [measure: closure = { name ->
-            Measure measure = usedLibrary.getMeasures().get(name)
-            [named: { measureName ->
-                MeasureUse measureUse = new MeasureUse()
-                measureUse.setName(measureName)
-
-                model.getUsedMeasure().add(measureName)
-                model.get
-            }]
-        }]
-	}
-
-    def usemeasure(String libUseName, String measureName) {
-        Map<String, String> args = new LinkedHashMap<String, String>()
-        ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createMeasureUse(libUseName, measureName, args)
+        model.getUsedLibraries().add(libraryUse)
+        current = libraryUse
 
         def closure
         [with: closure = {
-            String key, String val ->
-                args.put(key, val)
-                println("usemeasure : libUseName " + key + " " + val + " size : " + ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().getUsedLibraries().size())
-                [and: closure]
+            String key ->
+                [valued: {
+                    String val ->
+                        args.put(key, val)
+                        [and: closure]
+                }]
+
         }]
-    }
+	}
 
-    def dump(String fuck) {
-        println("Libraries Loaded : ")
-        for (Map.Entry<String, Library> libraries : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_librairies) {
-            println("\t\t - " + libraries.key);
-            for (Map.Entry<String, Measure> measure : ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().loaded_measures) {
-                if (measure.getValue().getLibrary().equals(libraries.value)) {
-                    println("\t\t\t\t\t (associate with) : " + measure.getKey());
-                }
-            }
-        }
+    def usemeasure(String measureName) {
+        GroovuinoMLModel model = ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel()
 
+        Map<String, String> args = new LinkedHashMap<String, String>()
+
+        MeasureUse measureUse = new MeasureUse();
+        measureUse.setName(measureName)
+        measureUse.setLibraryUse(current)
+        measureUse.setMeasure(current.getLibrary().getMeasures().get(measureName))
+
+        model.getUsedMeasure().add(measureUse)
+        model.getBricks()     .add(measureUse)
+
+        [named: { String name ->
+            measureUse.setName(name)
+            binding.setVariable(measureUse.getName(), measureUse)
+            def closure
+            [with: closure = {
+                String key ->
+                    [valued: {
+                        String val ->
+                            args.put(key, val)
+                            [and: closure]
+                    }]
+            }]
+        }]
     }
 
     // sensor "name" pin n
@@ -128,32 +117,137 @@ abstract class GroovuinoMLBasescript extends Script {
 
     // from state1 to state2 when sensor becomes signal
     def from(State state1) {
-        [to: { state2 ->
-            [when: { sensor ->
-                [EQ: { int signal ->
-                    ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
+        Transition transition = new Transition();
+        state1.setTransition(transition)
+        [to: { State state2 ->
+            transition.setNext(state2)
+
+            ConditionTree conditionTree = null
+
+            def conditionClosure
+            [when: conditionClosure = { sensor ->
+
+                if (conditionTree == null) {
+                    conditionTree = new ConditionTree();
+                    transition.setCondition(conditionTree);
+                }
+                else {
+                    ConditionTree next = new ConditionTree()
+                    conditionTree.setNext(next)
+                    conditionTree = next
+                }
+
+                conditionTree.setLeft(sensor)
+                [eq: { int signal ->
+                    conditionTree.setOperator(Operator.EQ)
+                    conditionTree.setRight(new IntegerExpression(signal))
+
+                    [and: { nextsensor ->
+                        conditionTree.setNextOperator(BinaryOperator.AND)
+                        conditionClosure(nextsensor)
+                    },
+                     or : {
+                         nextsensor ->
+                             conditionTree.setNextOperator(BinaryOperator.OR)
+                             conditionClosure(nextsensor)
+                     }
+                    ]
+
                 },
-                 GE: { int signal ->
-                     // println("cc")
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GE)
+                 greater_eq: { int signal ->
+                     conditionTree.setOperator(Operator.GE)
+                     conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
-                 GT: { int signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.GT)
+                 greater_than: { int signal ->
+                     conditionTree.setOperator(Operator.GT)
+                     conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
-                 LE: { int signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LE)
+                 lower_eq: { int signal ->
+                     conditionTree.setOperator(Operator.LE)
+                     conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
-                 LT: { int signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.LT)
+                 lower_than: { int signal ->
+                     conditionTree.setOperator(Operator.LT)
+                     conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
-                 NE: { int signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
+                 not_eq: { int signal ->
+                     conditionTree.setOperator(Operator.NE)
+                     conditionTree.setRight(new IntegerExpression(signal))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                      or : {
+                          nextsensor ->
+                              conditionTree.setNextOperator(BinaryOperator.OR)
+                              conditionClosure(nextsensor)
+                      }
+                     ]
                  },
-                 EQ: { SIGNAL signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.EQ)
+                 eq: { SIGNAL signal ->
+                     conditionTree.setOperator(Operator.EQ)
+                     conditionTree.setRight(new DigitalExpression(signal == high ? true : false))
+
+                     [and: { nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.AND)
+                         conditionClosure(nextsensor)
+                     },
+                     or : {
+                         nextsensor ->
+                         conditionTree.setNextOperator(BinaryOperator.OR)
+                         conditionClosure(nextsensor)
+                     }
+                     ]
+
                  },
-                 NE: { SIGNAL signal ->
-                     ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal, Operator.NE)
+                 not_eq: { SIGNAL signal ->
+                     conditionTree.setOperator(Operator.NE)
+                     conditionTree.setRight(new DigitalExpression(signal == high ? true : false))
                  }
                 ]
             }]
