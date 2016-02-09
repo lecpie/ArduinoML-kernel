@@ -181,6 +181,9 @@ public class GroovuinoMLModel {
 
     }
 
+    public List<Brick> getBricks() {
+        return bricks;
+    }
 
     @SuppressWarnings("rawtypes")
     public Object generateCode(String appName) {
