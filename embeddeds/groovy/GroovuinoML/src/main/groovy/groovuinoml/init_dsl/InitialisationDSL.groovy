@@ -25,8 +25,9 @@ class InitialisationDSL {
         configuration.setScriptBaseClass("main.groovy.groovuinoml.init_dsl.InitialisationBaseScript")
         shell = new GroovyShell(configuration)
 
-        binding.setVariable("integer",  Type.INTEGER)
-        binding.setVariable("digital",  Type.DIGITAL)
+        binding.setVariable("real",    Type.REAL)
+        binding.setVariable("integer", Type.INTEGER)
+        binding.setVariable("digital", Type.DIGITAL)
     }
 
     void eval(File scriptFile) {
