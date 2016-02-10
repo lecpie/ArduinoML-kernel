@@ -83,7 +83,7 @@ abstract class GroovuinoMLBasescript extends Script {
 
                  binding.setVariable(previousname, measureUse)
 
-                 [with: argsclosure = argsclosure]
+                 [with: argsclosure]
         }]
     }
 
@@ -176,7 +176,7 @@ abstract class GroovuinoMLBasescript extends Script {
                 conditionTree.setLeft(sensor)
                 [eq: { signal ->
                     nextConditionClosure(signal, Operator.EQ)
-                },
+                 },
                  greater_eq: { signal ->
                      nextConditionClosure(signal, Operator.GE)
 
@@ -186,7 +186,6 @@ abstract class GroovuinoMLBasescript extends Script {
                  },
                  lower_eq: { signal ->
                      nextConditionClosure(signal, Operator.LE)
-
                  },
                  lower_than: { signal ->
                      nextConditionClosure(signal, Operator.LT)
