@@ -200,6 +200,18 @@ public class GroovuinoMLModel {
         return codeGenerator.getResult();
     }
 
+    public Expression makeExpression(int value) {
+        return new IntegerExpression(value);
+    }
+
+    public Expression makeExpression(double value) {
+        return new RealExpression(value);
+    }
+
+    public Expression makeExpression (SIGNAL value) {
+        return new DigitalExpression(value == SIGNAL.HIGH);
+    }
+
     public void importlib(String path) {
         InitialisationDSL initdsl = new InitialisationDSL();
 

@@ -1,8 +1,8 @@
 importlib "scripts/GPS.groovy"
 
 uselib "GPS" with "rx" valued "2" and "tx" valued "1"
-usemeasure "latitude" named "latitude"
-usemeasure "longitude" named "longitude"
+usemeasure "latitude"
+usemeasure "longitude"
 
 actuator "buzzer" digitalPin 12
 
@@ -15,4 +15,4 @@ initial off
 from on to off when latitude lower_than   43.615911 and latitude greater_than 43.615107 and longitude lower_than   7.073454 and longitude greater_than 7.072564
 from off to on when latitude greater_than 43.615911 or  latitude lower_than   43.615107 or  longitude greater_than 7.073454 or  longitude lower_than   7.072564
 
-export "HomeArrest"
+export "StayInLabRoom"
