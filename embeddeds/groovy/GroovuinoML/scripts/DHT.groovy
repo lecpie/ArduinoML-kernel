@@ -1,3 +1,5 @@
+//https://github.com/Seeed-Studio/Grove_Temperature_And_Humidity_Sensor
+
 library "DHT"
 includes "DHT.h"
 requires "dht_pin" and "dht_type"
