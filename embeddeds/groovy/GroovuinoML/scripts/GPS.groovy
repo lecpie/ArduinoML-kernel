@@ -2,7 +2,7 @@ library "GPS"
 includes "SoftwareSerial.h" and "BufferedGPS.h"
 requires "rx" and "tx"
 variables "gps"
-args "baudrate" valued "4800" and "refreshrate" valued "0.50"
+args "baudrate" valued "4800" and "refreshrate" valued "50"
 global "MinimalGPS gps(rx, tx, refreshrate);"
 setup "gps.begin(baudrate);"
 
