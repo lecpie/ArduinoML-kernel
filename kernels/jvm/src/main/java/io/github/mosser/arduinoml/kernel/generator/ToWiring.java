@@ -196,19 +196,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 				condition.getRight().expression(this);
 
 				break;
-
-			case STRING:
-				switch (condition.getOperator()) {
-					case EQ:
-					case NE:
-						break;
-
-					default:
-						throw new CompilationError("Comparison " + condition.getOperator() + " not allowed on types " + condition.getLeft().getType());
-				}
-
-				//TODO String comparison strcmp
-
 		}
 
 
