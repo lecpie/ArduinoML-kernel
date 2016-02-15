@@ -155,7 +155,7 @@ abstract class GroovuinoMLBasescript extends Script {
             }
 
             nextConditionClosure = { signal, Operator operator ->
-                conditionTree.setOperator(Operator.EQ)
+                conditionTree.setOperator(operator)
                 conditionTree.setRight(model.makeExpression(signal))
 
                 addConditionClosure()
