@@ -349,15 +349,21 @@ public class ToWiring extends Visitor<StringBuffer> {
 	public void visit(Transition transition) {
 
 		if (transition.getCondition() != null) {
-			Expression left = transition.getCondition().getLeft();
-			Expression right = transition.getCondition().getRight();
 
-			if (left instanceof Updatable) {
-				((Updatable) left).update(this);
-			}
+			// Update all updatable expressions in the condition
+			for (Condition condition = transition.getCondition(); condition != null;
+				 condition = (condition instanceof ConditionTree) ? ((ConditionTree) condition).getNext() : null) {
 
-			if (right instanceof Updatable) {
-				((Updatable) right).update(this);
+				Expression left  = condition.getLeft();
+				Expression right = condition.getRight();
+
+				if (left instanceof Updatable) {
+					((Updatable) left).update(this);
+				}
+
+				if (right instanceof Updatable) {
+					((Updatable) right).update(this);
+				}
 			}
 		}
 
