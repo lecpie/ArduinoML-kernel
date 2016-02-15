@@ -385,6 +385,10 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void action(Action action) {
+		if (!action.getActuator().isAnalogMode() && action.getSignalExpression().getType() != Type.DIGITAL) {
+			throw new CompilationError("non analog actuator");
+		}
+
 		add("#define " + ARDUINOML_GEN_ARG1 + " ");
 		action.getSignalExpression().expression(this);
 		w("");
